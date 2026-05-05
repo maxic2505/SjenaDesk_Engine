@@ -1,10 +1,23 @@
 #pragma once
 
+
+#if defined(__arm__) || defined(__aarch64__)
+#include <arm_neon.h>
+#define USING_ARM 1
+#elif defined(__x86_64__) || defined(_M_X64)
 #include <immintrin.h>
+#define USING_X86_X64 1
+#endif
 
 #ifdef __cplusplus
 extern "C"{
 #endif
+
+float inv_sqrt(float len2);
+
+
+
+
 
 typedef struct Vec2{
     float x,y;

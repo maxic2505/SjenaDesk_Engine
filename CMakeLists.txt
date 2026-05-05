@@ -20,5 +20,5 @@ add_executable(
     ${SjenaDesk_Input}
 )
 
-file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
+# file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 
