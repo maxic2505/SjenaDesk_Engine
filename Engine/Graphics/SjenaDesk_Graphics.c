@@ -1,15 +1,5 @@
 #include "SjenaDesk_Graphics.h"
 
-
-// LINUX GRAPHICS SYSTEM
-
-#ifdef __linux__
-	
-#endif
-
-
-// WINDOWS GRAPHICS SYSTEM
-
 #ifdef _WIN32
 
 unsigned char graphic_render_text(Object* object, HDC* hdc, HBRUSH* brush) {
@@ -46,10 +36,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
+#endif
+
 // Graphic | Register a Window | 0 = Success
 unsigned char graphic_register_window(Window* window, const char* class) {
-	if (!hInstance)hInstance = GetModuleHandle(NULL);
 	if (!window)return 1;
+
+	#if defined(_WIN32)
+	if (!hInstance)hInstance = GetModuleHandle(NULL);
 	unsigned char class_size = strlen(class)+1;
 	if (class_size >= WINDOW_MAX_CLASS_SIZE)return 1;
 	memcpy(window->class, class, class_size);
@@ -64,12 +58,16 @@ unsigned char graphic_register_window(Window* window, const char* class) {
 	unsigned char status = (RegisterClassEx(&wc) == 0) ? ((GetLastError() != ERROR_CLASS_ALREADY_EXISTS) ? 1 : 0) : 0;
 	if(status)memset(window->class, 0, WINDOW_MAX_CLASS_SIZE);
 	return status;
+	#elif defined(__linux)
+	return 0;
+	#endif
 }
 
-// Graphic | Creates a Window | 0 = Success | 2 = register | 3 = Create
+// Graphic | Creates a Window | 0 = Success
 unsigned char graphic_create_window(Window* window, const char* name, long window_style, const long x, const long y, const long width, const long height) {
+	#if defined(_WIN32)
 	if (!window || window->hwnd) return 1;
-	if(!hInstance)return 2;
+	if(!hInstance)return 1;
 	window->hwnd = CreateWindowEx(
 		0,
 		window->class,
@@ -77,27 +75,41 @@ unsigned char graphic_create_window(Window* window, const char* name, long windo
 		window_style,
 		x, y, width, height,
 		NULL, NULL, hInstance, NULL);
-	if (!window->hwnd) return 3;
+	if (!window->hwnd) return 1;
+	#elif defined(__linux__)
+
+	#endif
 	return 0;
 }
 // Graphic | Show/Hidde a Window | 0 = Success
 unsigned char graphic_show_window(Window* window, const unsigned char show) {
+	#if defined(_WIN32)
 	if (!window || !window->hwnd) return 1;
 	ShowWindow(window->hwnd, (show == 1) ? SW_SHOW : SW_HIDE);
+	#elif defined(__linux)
+
+	#endif
 	return 0;
 }
 // Graphic | Destroy a Window | 0 = Success
 unsigned char graphic_destroy_window(Window* window) {
+	#if defined(_WIN32)
 	if (window && window->hwnd && DestroyWindow(window->hwnd)) {
 		memset(window, 0, sizeof(Window));
-		return 0;
-	}
-	return 1;
+	}else return 1;
+	#elif defined(__linux__)
+
+	#endif
+	return 0;
 }
 
 // Graphic | UI | Create Text Object | 0 = Success
 unsigned char graphic_create_text(Object* object, Window* window, uVec2 position, uVec2 size, Text* text_object, const char* text) {
+	#if defined(_WIN32)
 	if (!object, !window, !window->hwnd, !text_object, !text) return 1;
+	#elif defined(__linux__)
+
+	#endif
 	unsigned char data_size = strlen(text)+1;
 	if (data_size >= OBJECT_TEXT_MAX_DATA_SIZE)return 1;
 
@@ -161,4 +173,3 @@ x, y, w, h
 r, g , b, a
 
 */
-#endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdlib.h>
+#include <string.h>
 #include "../Math/SjenaDesk_Vector.h"
 
 #define WINDOW_MAX_CLASS_SIZE 24
@@ -13,13 +15,15 @@
 #define ALIGN_TO_8 __declspec(align(8))
 #endif
 
-#ifdef _WIN32
 typedef struct Window {
+	#if defined(_WIN32)
 	HWND hwnd;
+	#elif defined(__linux__)
+	void* hwnd;
+	#endif
 
 	char class[WINDOW_MAX_CLASS_SIZE];
 }Window;
-#endif
 
 typedef struct Object {
 	Window* parent_window;
@@ -29,7 +33,7 @@ typedef struct Object {
 
 typedef struct Color { unsigned char r, g, b, a; } Color;
 
-ALIGN_TO_8
+//ALIGN_TO_8
 typedef struct Text {
 	unsigned char type;
 
@@ -41,7 +45,7 @@ typedef struct Text {
 	char data[OBJECT_TEXT_MAX_DATA_SIZE];
 }Text;
 
-ALIGN_TO_8
+//ALIGN_TO_8
 typedef struct Button {
 	unsigned char type;
 
