@@ -1,8 +1,9 @@
 Last Worked on: 5.05.2025 | 13:30
 
     TODO:
-        Refactoring
-	UI Frameword (Windows)
+	    UI Frameword (Windows)
+        Sort out functions
+        Make logger
 
     Finished:
         Input System
@@ -12,4 +13,5 @@ Last Worked on: 5.05.2025 | 13:30
     Changelog:
         08.01.2026 : C function style + Comments + few Keys Removed / Backspace added
         19.02.2026 : Windows Key Input | Cache + Handler
-	05.05.2026 : Imported in Github
+	    05.05.2026 : Imported in Github
+        07.05.2026 : Refactored into src & include

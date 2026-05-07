@@ -1,24 +1,21 @@
 cmake_minimum_required(VERSION 3.10.0)
-project(Game VERSION 0.1.0 LANGUAGES C)
+project(Engine LANGUAGES C)
 
 # Build
-set(SjenaDesk_Engine        Engine/SjenaDesk_Engine.c                      )
-set(SjenaDesk_Components    Engine/SjenaDesk_Components.c                  )
-set(SjenaDesk_Graphics      Engine/Graphics/SjenaDesk_Graphics.c           )
-set(SjenaDesk_Input         Engine/Input/SjenaDesk_Input.c                 )
+set(SOURCES
+    main.c
+    src/SjenaDeskEngine/Graphics/Graphics.c
+    src/SjenaDeskEngine/Input/Input.c
+    src/SjenaDeskEngine/Math/Vector.c
+    src/SjenaDeskEngine/Components.c
+    src/SjenaDeskEngine/Core.c
+)
 
 # Add
-add_executable(
-    ${PROJECT_NAME}
-
-    main.c
-
-    # Engine - Files
-    ${SjenaDesk_Engine} 
-    ${SjenaDesk_Components}
-    ${SjenaDesk_Graphics} 
-    ${SjenaDesk_Input}
+add_executable(Engine ${SOURCES}
 )
+
+target_include_directories(Engine PUBLIC include)
 
 # file(COPY assets DESTINATION ${CMAKE_BINARY_DIR})
 

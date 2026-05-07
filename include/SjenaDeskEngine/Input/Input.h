@@ -1,7 +1,7 @@
 #pragma once
 
-#include "SjenaDesk_Key.h"
-#include "../Math/SjenaDesk_Vector.h"
+#include "SjenaDeskEngine/Input/KeyLayout.h"
+#include "SjenaDeskEngine/Math/Vector.h"
 
 #ifdef __linux__
 #include <linux/input.h>
