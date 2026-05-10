@@ -5,7 +5,6 @@ project(Engine LANGUAGES C)
 set(SOURCES
     main.c
     src/SjenaDeskEngine/Graphics/Graphics.c
-    src/SjenaDeskEngine/Graphics/UI.c
     src/SjenaDeskEngine/Input/Input.c
     src/SjenaDeskEngine/Math/Vector.c
     src/SjenaDeskEngine/Components.c

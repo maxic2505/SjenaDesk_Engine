@@ -5,8 +5,8 @@
 #include "SjenaDeskEngine/Math/Vector.h"
 
 #define WINDOW_MAX_CLASS_SIZE 24
-#define OBJECT_TYPE_BUTTON 12
-#define OBJECT_TYPE_TEXT 5
+#define OBJECT_TYPE_BUTTON 6
+#define OBJECT_TYPE_TEXT 2
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -24,44 +24,45 @@ typedef struct Window {
 	char class[WINDOW_MAX_CLASS_SIZE];
 }Window;
 
+typedef enum Extra{
+	IS_ACTIVE =      1<<0,
+	IS_VISIBLE =     1<<1,
+	IS_CLICKABLE =   1<<2,
+	USE_IMG =        1<<3,
+	USE_BORDER =   	 1<<4,
+	USE_BG_COLOR =   1<<5,
+	COLOR_OVER =	 1<<6,
+	COLOR_ON_CLICK = 1<<7,
+}Extra;
+
 typedef struct Object {
-	Window* parent_window;
-	long  type;
-	void* object;
-	long  size;
+	void* parent_window;
+	void* properties;
 	void* data;
-	size_t size;
+	unsigned long long data_size;
+	unsigned long long extra;
 	uVec2 position, size;
+	unsigned int type, id;
 }Object;
 
 typedef struct Text {
-	unsigned char font_size;
-	unsigned char font;
-	unsigned char style;
-
-	Color color;
+	Color text_color;
+	Color bg_color;
 }Text;
 
 typedef struct Button {
-	unsigned char id;
-	unsigned char is_active;
-	unsigned char is_pressed;
-
-	unsigned char color_strength;
-	unsigned char style;
-	unsigned char border_roundness;
-
+	Color color_text;
 	Color color_over;
 	Color color_on_click;
 	Color color_active;
 	Color color_deactive;
-
+	Color color_border;
 }Button;
 
 #ifdef __cplusplus
 extern "C"{
 #endif
-// Testen bitte!!!
+// Test required | Undone
 typedef unsigned char (*Graphics_Input_Callback)(int value);
 
 unsigned char graphic_register_window	(Window* window, const char* class);
@@ -71,8 +72,8 @@ unsigned char graphic_destroy_window	(Window* window);
 
 unsigned char graphic_register_object	(Object* object, Object* dst, unsigned char size);
 unsigned char graphic_remove_object		(Object* object, Object* src, unsigned char size);
-unsigned char graphic_create_text		(Object* object, Window* window, uVec2 position, uVec2 size, Text* text_object, const char* text);
-unsigned char graphic_create_button		(Object* object, Window* window, uVec2 position, uVec2 size, Button* button		, const char* text);
+unsigned char graphic_create_text		(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Text* properties, Extra extra, unsigned int id);
+unsigned char graphic_create_button		(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Button* properties, Extra extra, unsigned int id);
 unsigned char graphic_create_object		(Object* object, Window* window, Color* color);
 unsigned char graphic_destroy_object	(Object* object);
 unsigned char graphic_get_object_type   (Object* object);

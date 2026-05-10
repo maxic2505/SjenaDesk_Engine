@@ -104,43 +104,77 @@ unsigned char graphic_destroy_window(Window* window) {
 }
 
 // Graphic | UI | Create Text Object | 0 = Success
-unsigned char graphic_create_text(Object* object, Window* window, uVec2 position, uVec2 size, Text* text_object, const char* text) {
+unsigned char graphic_create_text(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Text* properties, Extra extra, unsigned int id) {
+	if(!object, !parent_window, !text, !properties) return 1;
+	
 	#if defined(_WIN32)
-	if (!object, !window, !window->hwnd, !text_object, !text) return 1;
+	if (!parent_window->hwnd) return 1;
 	#elif defined(__linux__)
-
+	if (!parent_window->hwnd) return 1;
 	#endif
-	unsigned char data_size = strlen(text)+1;
-	if (data_size >= OBJECT_TEXT_MAX_DATA_SIZE)return 1;
 
-	object->data = malloc(sizeof(Text));
-	if(!object->data)return 1;
+	size_t text_size = strlen(text)+1;
+	object->data = malloc(text_size);
+	if(!object->data){
+		free(object->data);
+		memset(object, 0, sizeof(Object));
+		return 1;
+	}
 
-	object->parent_window = window;
+	object->properties = malloc(sizeof(Text));
+	if(!object->properties){
+		memset(object, 0, sizeof(Object));
+		return 1;
+	}
+
+	memcpy(object->properties, properties, sizeof(Text));
+	memcpy(object->data, text, text_size);
+
+	object->parent_window = parent_window;
+	object->data_size = text_size;
 	object->position = position;
+	object->extra = extra;
 	object->size = size;
-
-	memcpy(object->data, &(Text){
-		.type = 1,
-		.font_size = text_object->font_size,
-		.font = text_object->font,
-		.style = text_object->style,
-		.color = text_object->color,
-	}, sizeof(Text));
-	memcpy(((Text*)object->data)->data, text, data_size); // 30.04.2026 | new, untested | remove if tested & compiled
+	object->type = OBJECT_TYPE_TEXT;
+	object->id = id;
 	return 0;
 }
-// Graphic | UI | Create Button Object | 0 = Success | 30.04.2026 >> new, untested
-unsigned char graphic_create_button(Object* object, Window* window, uVec2 position, uVec2 size, Button* button, const char* text) {
-	if (!object, !window, !button) return 1;
 
-	// ... object data
+// Graphic | UI | Create Button Object | 0 = Success
+unsigned char graphic_create_button(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Button* properties, Extra extra, unsigned int id) {
+	if (!object, !parent_window, !properties) return 1;
 
-	if (text){
-		unsigned char data_text_size = (strlen(text)+1);
-		if(data_text_size >= OBJECT_BUTTON_MAX_TEXT_SIZE)return 1;
-		memcpy(((Button*)object->data)->text, text, data_text_size);
+	#if defined(_WIN32)
+	if (!parent_window->hwnd) return 1;
+	#elif defined(__linux__)
+	if (!parent_window->hwnd) return 1;
+	#endif
+
+	size_t data_size = (text) ? strlen(text)+1 : 0;
+
+	if(text){
+		object->data = malloc(data_size);
+		if(!object->data)return 1;
 	}
+
+	object->properties = malloc(sizeof(Button));
+	if(!object->properties){
+		if(object->data)free(object->data);
+		memset(object, 0, sizeof(Object));
+		return 1;
+	}
+
+	memcpy(object->properties, properties, sizeof(Button));
+	if(object->data)memcpy(object->data, text, strlen(text)+1);
+
+	object->parent_window = parent_window;
+	object->data_size = data_size;
+	object->position = position;
+	object->extra = extra;
+	object->size = size;
+	object->type = OBJECT_TYPE_BUTTON;
+	object->id = id;
+
 	return 0;
 }
 // Graphic | UI | Create Plain Object | 0 = Success
