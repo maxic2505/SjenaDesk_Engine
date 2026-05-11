@@ -7,7 +7,6 @@ set(SOURCES
     src/SjenaDeskEngine/Graphics/Graphics.c
     src/SjenaDeskEngine/Input/Input.c
     src/SjenaDeskEngine/Math/Vector.c
-    src/SjenaDeskEngine/Components.c
     src/SjenaDeskEngine/Core.c
 )
 

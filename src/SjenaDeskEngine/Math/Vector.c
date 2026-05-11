@@ -1,24 +1,24 @@
 #include "SjenaDeskEngine/Math/Vector.h"
 
 float inv_sqrt(float len2){
-	if(len2)return 0;
-	//Newton: r * (1,5 - 0.5 * len2 * r*r)
-	#if defined(USING_X86_X64)
+    if(len2 <= 0.01f)return 0;
+    //Newton: r * (1,5 - 0.5 * len2 * r*r)
+    #if defined(USING_X86_X64)
 
-	__m128 x = _mm_set_ss(len2);
-	__m128 r = _mm_rsqrt_ss(x);
+    __m128 x = _mm_set_ss(len2);
+    __m128 r = _mm_rsqrt_ss(x);
 
-	const __m128 half = _mm_set_ss(0.5f);
-	const __m128 three = _mm_set_ss(1.5f);
+    const __m128 half = _mm_set_ss(0.5f);
+    const __m128 three = _mm_set_ss(1.5f);
 
-	__m128 r2     = _mm_mul_ss(r      ,    r);
-	__m128 h_len2 = _mm_mul_ss(half   ,    x);
-	__m128 term   = _mm_mul_ss(h_len2 ,   r2);
-	__m128 nr     = _mm_mul_ss(r      ,_mm_sub_ss(three, term));
+    __m128 r2     = _mm_mul_ss(r      ,    r);
+    __m128 h_len2 = _mm_mul_ss(half   ,    x);
+    __m128 term   = _mm_mul_ss(h_len2 ,   r2);
+    __m128 nr     = _mm_mul_ss(r      ,_mm_sub_ss(three, term));
 
-	float inv_len = _mm_cvtss_f32(nr);
+    float inv_len = _mm_cvtss_f32(nr);
 
-	#elif defined(USING_ARM)
+    #elif defined(USING_ARM)
 
     float32x2_t x = vdup_n_f32(len2);
     float32x2_t r = vrsqrte_f32(x);
@@ -30,11 +30,12 @@ float inv_sqrt(float len2){
     float32x2_t h_len2 = vmul_f32(half, x);
     float32x2_t term = vmul_f32(h_len2, r2);
     float32x2_t nr = vmul_f32(r, vsub_f32(third, term));
-    float inv = vget_lane_f32(nr, 0);
+
+    float inv_len = vget_lane_f32(nr, 0);
 
     #endif
 
-        return inv_len;
+    return inv_len;
 }
 
 Vec2 vec2_add(Vec2 a, Vec2 b){

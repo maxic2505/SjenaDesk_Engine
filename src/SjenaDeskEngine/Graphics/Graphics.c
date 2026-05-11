@@ -58,7 +58,7 @@ unsigned char graphic_register_window(Window* window, const char* class) {
 	unsigned char status = (RegisterClassEx(&wc) == 0) ? ((GetLastError() != ERROR_CLASS_ALREADY_EXISTS) ? 1 : 0) : 0;
 	if(status)memset(window->class, 0, WINDOW_MAX_CLASS_SIZE);
 	return status;
-	#elif defined(__linux)
+	#elif defined(__linux__)
 	return 0;
 	#endif
 }
@@ -105,7 +105,7 @@ unsigned char graphic_destroy_window(Window* window) {
 
 // Graphic | UI | Create Text Object | 0 = Success
 unsigned char graphic_create_text(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Text* properties, Extra extra, unsigned int id) {
-	if(!object, !parent_window, !text, !properties) return 1;
+	if(!object || !parent_window || !text || !properties) return 1;
 	
 	#if defined(_WIN32)
 	if (!parent_window->hwnd) return 1;
@@ -142,7 +142,7 @@ unsigned char graphic_create_text(Object* object, Window* parent_window, uVec2 p
 
 // Graphic | UI | Create Button Object | 0 = Success
 unsigned char graphic_create_button(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Button* properties, Extra extra, unsigned int id) {
-	if (!object, !parent_window, !properties) return 1;
+	if (!object || !parent_window || !properties) return 1;
 
 	#if defined(_WIN32)
 	if (!parent_window->hwnd) return 1;

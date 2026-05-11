@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include "SjenaDeskEngine/Components.h"
 #include "SjenaDeskEngine/Math/Vector.h"
+#include "SjenaDeskEngine/Core.h"
 
 int main(){
 	Component component[64] = { 0 };
