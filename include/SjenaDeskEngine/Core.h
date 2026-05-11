@@ -7,21 +7,30 @@
 extern "C"{
 #endif
 
+typedef enum ComponentProperties{
+    REGISTERED = 1<<0,
+    LOCKED     = 1<<1,
+    READ_ONLY  = 1<<2,
+}ComponentProperties;
+
 typedef struct Component{
-    void* data;        //  8 Bytes
-    size_t size;       //  4 Bytes
-    unsigned int type; //  4 Bytes
-}Component;            // 16 Bytes
+    void* data;
+    unsigned int size;
+    unsigned char properties;
+}Component;
 
-// Components | Set a Component | 0 : OK
-unsigned char component_set(Component* component_slot, unsigned int type, void* data, size_t data_size);
+typedef struct ComponentManager{
+    Component *components;
+    long long size;
+}ComponentManager;
 
-// Components | Remove the Component | 0 : OK
-unsigned char component_remove(Component* componentSlot);
+Component component_create(unsigned int type, void* data, size_t data_size);
 
-// Components | Search and get the Data | null : ERROR else OK.
-Component* component_get(Component* component_arr, unsigned char length, unsigned int type);
+unsigned char component_free(Component* componentSlot);
 
+ComponentManager component_mgr_create(unsigned int size);
+
+unsigned char component_mgr_free(ComponentManager* mgr);
 #ifdef __cplusplus
 }
 #endif
