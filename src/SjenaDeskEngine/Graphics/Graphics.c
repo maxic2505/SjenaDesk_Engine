@@ -115,15 +115,12 @@ unsigned char graphic_create_text(Object* object, Window* parent_window, uVec2 p
 
 	size_t text_size = strlen(text)+1;
 	object->data = malloc(text_size);
-	if(!object->data){
-		free(object->data);
-		memset(object, 0, sizeof(Object));
-		return 1;
-	}
+	if(!object->data)return 1;
 
 	object->properties = malloc(sizeof(Text));
 	if(!object->properties){
-		memset(object, 0, sizeof(Object));
+		free(object->data);
+		object->data = NULL;
 		return 1;
 	}
 

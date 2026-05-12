@@ -19,7 +19,7 @@ unsigned char component_create(Component* cmp, unsigned char properties, unsigne
 unsigned char component_free(Component* cmp){
     if(!cmp) return 1;
     if(!cmp->data) return 1;
-    //if(cmp | ) return 1: Restriction
+    if(cmp->properties & (LOCKED_DATA | REGISTERED_SYS | REGISTERED_MGR)) return 1;
     free(cmp->data);
     memset(cmp, 0, sizeof(Component));
     return 0;

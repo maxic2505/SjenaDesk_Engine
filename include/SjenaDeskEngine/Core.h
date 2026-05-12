@@ -22,7 +22,7 @@ typedef struct Component{
     unsigned char properties;
     unsigned char type;
     unsigned char id;
-    unsigned char data;
+    unsigned char u_data;
 }Component;
 
 typedef struct ComponentManager{
