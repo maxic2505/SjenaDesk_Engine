@@ -106,7 +106,7 @@ unsigned char graphic_destroy_window(Window* window) {
 // Graphic | UI | Create Text Object | 0 = Success
 unsigned char graphic_create_text(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Text* properties, Extra extra, unsigned int id) {
 	if(!object || !parent_window || !text || !properties) return 1;
-	
+
 	#if defined(_WIN32)
 	if (!parent_window->hwnd) return 1;
 	#elif defined(__linux__)
@@ -138,7 +138,7 @@ unsigned char graphic_create_text(Object* object, Window* parent_window, uVec2 p
 }
 
 // Graphic | UI | Create Button Object | 0 = Success
-unsigned char graphic_create_button(Object* object, Window* parent_window, uVec2 position, uVec2 size, const char* text, Button* properties, Extra extra, unsigned int id) {
+unsigned char graphic_create_button(Object* object, Window* parent_window, uVec2 position, uVec2 size, void* data, size_t data_size, Button* properties, Extra extra, unsigned int id) {
 	if (!object || !parent_window || !properties) return 1;
 
 	#if defined(_WIN32)
@@ -147,9 +147,9 @@ unsigned char graphic_create_button(Object* object, Window* parent_window, uVec2
 	if (!parent_window->hwnd) return 1;
 	#endif
 
-	size_t data_size = (text) ? strlen(text)+1 : 0;
+	if(extra & USE_TEXT) data_size = (data) ? strlen(data)+1 : 0;
 
-	if(text){
+	if(data && data_size>0){
 		object->data = malloc(data_size);
 		if(!object->data)return 1;
 	}
@@ -157,12 +157,13 @@ unsigned char graphic_create_button(Object* object, Window* parent_window, uVec2
 	object->properties = malloc(sizeof(Button));
 	if(!object->properties){
 		if(object->data)free(object->data);
-		memset(object, 0, sizeof(Object));
+		object->properties = NULL;
+		object->data = NULL;
 		return 1;
 	}
 
 	memcpy(object->properties, properties, sizeof(Button));
-	if(object->data)memcpy(object->data, text, strlen(text)+1);
+	if(object->data)memcpy(object->data, data, data_size);
 
 	object->parent_window = parent_window;
 	object->data_size = data_size;
