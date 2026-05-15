@@ -84,9 +84,9 @@ typedef enum{
     KEYCODE_F9,
 
     // MOUSE
-    MOUSE_LEFT_CLICK,
-    MOUSE_RIGHT_CLICK,
-    MOUSE_MIDDLE_CLICK
+    MOUSE_LEFT,
+    MOUSE_RIGHT,
+    MOUSE_MIDDLE
 } KeyCode;
 
 typedef struct Key{

@@ -75,6 +75,7 @@ int api_key_map(int code) {
 }
 
 HHOOK hook;
+HHOOK mouse_hook;
 MSG msg;
 unsigned char w_event[60];
 
@@ -98,11 +99,37 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(hook, nCode, wParam, lParam);
 }
 
+LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam){
+    if(nCode == HC_ACTION){
+        unsigned long long key_num = wParam-0x0200;
+
+        // MY EVENTS
+        // NONE = 0
+        //   UP = 1
+        // DOWN = 2
+
+        // CALCULATED EVENTS
+        //  0 = DOWN
+        //  1 = DOWN
+        //  2 = UP
+
+        if(key_num<10 && key_num>0){
+            unsigned char key_state = ((unsigned char)key_num % 3);
+            unsigned char key   = ((unsigned char)key_num / 3) + MOUSE_LEFT; 
+            if(key_state == 0)key--;
+
+            input_key_callback(key, (key_state == 2) ? 0 : 1);
+        }
+    }
+    return CallNextHookEx(mouse_hook, nCode, wParam, lParam);
+}
+
 // Input-API | 0 = Success
 unsigned char input_key_setup_api() {
-    if (hook != NULL) return 1;
-    hook = SetWindowsHookExW(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
-    return (hook == NULL) ? 1 : 0;
+    if(!hook)      hook        = SetWindowsHookExW(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
+    if(!mouse_hook)mouse_hook  = SetWindowsHookExW(WH_MOUSE_LL,    LowLevelMouseProc, NULL, 0);
+
+    return (!hook || !mouse_hook) ? 1 : 0;
 }
 
 unsigned char input_key_handler_api() {
