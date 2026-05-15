@@ -8,15 +8,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
+#define KEYS_AVAILABLE 60
 #endif
 
 #ifdef _WIN32
 #include <Windows.h>
-
-#define USING_WINDOWS_INPUT 1
+#define KEYS_AVAILABLE 63
 #endif
-
-#define KEYS_AVAILABLE 60
 
 #ifdef __cplusplus
 extern "C"{
