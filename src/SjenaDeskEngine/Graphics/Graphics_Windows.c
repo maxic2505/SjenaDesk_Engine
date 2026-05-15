@@ -2,6 +2,8 @@
 
 
 
+#if defined(_WIN32)
+
 /*
 int FillRect(
   [in] HDC        hDC,
@@ -75,7 +77,6 @@ unsigned char graphic_register_window(Window* window, const char* class) {
 
 // Graphic | Creates a Window | 0 = Success
 unsigned char graphic_create_window(Window* window, const char* name, long window_style, const long x, const long y, const long width, const long height) {
-	#if defined(_WIN32)
 	if (!window && window->hwnd) return 1;
 	if(!hInstance)return 1;
 	window->hwnd = CreateWindowEx(
@@ -86,9 +87,6 @@ unsigned char graphic_create_window(Window* window, const char* name, long windo
 		x, y, width, height,
 		NULL, NULL, hInstance, NULL);
 	if (!window->hwnd) return 1;
-	#elif defined(__linux__)
-
-	#endif
 	return 0;
 }
 
@@ -107,3 +105,5 @@ unsigned char graphic_destroy_window(Window* window) {
 
     return 0;
 }
+
+#endif
