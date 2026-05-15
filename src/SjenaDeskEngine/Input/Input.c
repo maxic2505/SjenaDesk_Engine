@@ -44,16 +44,14 @@ int input_key_callback(int code, int value){
     }
 }
 
-// Put it at the end of the fixed update for a key reset to avoid undetected States per frame.
-int input_key_handler(){
+void input_reset(){
     for(int i = 0; i<KEYS_AVAILABLE;i++){
         input.key[i].isConsumed = 1;
 
         // ONE SHOT KEYS RESET
-        if(!(input.key[i].state > 0) || is_modifier(i)) continue;
+        if(is_modifier(i)) continue;
         input.key[i].state = 0;
     }
-    return 1;
 }
 
 
@@ -145,6 +143,8 @@ unsigned char input_key_setup_api() {
 
 // Input-API | Handler to scan for keys | Use it at the beginning of the while loop
 unsigned char input_key_handler_api() {
+    input_reset();
+    
     while (read(event_file, &event, sizeof(event)) > 0) {
         if (event.type != EV_KEY) continue;
         input_key_callback(api_key_map(event.code), event.value);
@@ -259,17 +259,19 @@ unsigned char input_key_setup_api() {
 }
 
 unsigned char input_key_handler_api() {
+    input_reset();
+
     // Keep Windows Thread alive
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+
     return 0;
 }
 
 uVec2 input_mouse_get_position() {
-    uVec2 point;
-    if (GetCursorPos(&point) != 0) return (uVec2) { point.x, point.y};
-    else return (uVec2) {0, 0};
+    POINT point;
+    return (GetCursorPos(&point) != 0) ? (uVec2) { point.x, point.y} : (uVec2) {0, 0};
 }
 #endif

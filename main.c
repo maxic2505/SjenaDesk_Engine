@@ -1,13 +1,17 @@
 #include <stdio.h>
 
-#include "SjenaDeskEngine/Math/Vector.h"
-#include "SjenaDeskEngine/Core.h"
+#include "SjenaDeskEngine/Input/Input.h"
 
 int main(){
-	Component cmp = {0};
-	component_create(&cmp, LOCKED_DATA, 1, 0, &(Vec2){67, 67}, sizeof(Vec2));
-	printf("FREE CREATE: %s\n", (component_free(&cmp)) ? "FAILED" : "SUCCESS");
-	cmp.properties &= ~LOCKED_DATA;
-	printf("FREE CREATE: %s\n", (component_free(&cmp)) ? "FAILED" : "SUCCESS");
+	input_key_setup_api();
+	
+	unsigned char running = 1;
+	while (running)
+	{
+		input_key_handler_api();
+		if(getKeyDown(KEYCODE_ESC))running = 0;
+		if(getKeyDown(KEYCODE_W) && getKeyDown(KEYCODE_LEFT_CTRL))printf("Moving Left\n");
+		if(getKeyDown(KEYCODE_S))printf("Moving Down\n");
+	}
 	return 0;
 }

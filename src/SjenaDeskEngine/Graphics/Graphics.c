@@ -3,13 +3,13 @@
 #ifdef _WIN32
 
 unsigned char graphic_render_text(Object* object, HDC* hdc, HBRUSH* brush) {
-
+	return 0;
 }
 unsigned char graphic_render_button(Object* object, HDC* hdc, HBRUSH* brush) {
-
+	return 0;
 }
 unsigned char graphic_render_object(Object* object, HDC* hdc, HBRUSH* brush) {
-
+	return 0;
 }
 
 HINSTANCE hInstance = {0};
@@ -44,7 +44,7 @@ unsigned char graphic_register_window(Window* window, const char* class) {
 
 	#if defined(_WIN32)
 	if (!hInstance)hInstance = GetModuleHandle(NULL);
-	unsigned char class_size = strlen(class)+1;
+	size_t class_size = strlen(class)+1;
 	if (class_size >= WINDOW_MAX_CLASS_SIZE)return 1;
 	memcpy(window->class, class, class_size);
 	WNDCLASSEX wc = {0};

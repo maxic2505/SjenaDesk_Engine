@@ -24,8 +24,6 @@ typedef struct Input{
     Key key[KEYS_AVAILABLE];
 }Input;
 
-extern Input input;
-
 unsigned char getKey(const int keycode);
 unsigned char getKeyDown(const int keycode);
 unsigned char getKeyUp(const int keycode);
@@ -34,8 +32,6 @@ uVec2 input_mouse_get_position();
 
 unsigned char input_key_setup_api();
 unsigned char input_key_handler_api();
-
-int input_key_handler();
 
 #ifdef __cplusplus
 }
