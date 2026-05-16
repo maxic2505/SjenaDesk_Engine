@@ -53,12 +53,18 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 
 // Graphic | Register a Window | 0 = Success
 unsigned char graphic_register_window(Window* window, const char* class) {
-	if (!window)return 1;
+	if (!window || !class)return 1;
 
 	if (!hInstance)hInstance = GetModuleHandle(NULL);
 
+	if(window->class){
+		free(window->class);
+		window->class = NULL;
+	}
+
 	size_t class_size = strlen(class)+1;
-	if (class_size >= WINDOW_MAX_CLASS_SIZE)return 1;
+	window->class = malloc(class_size);
+	if(!window->class)return 1;
 	memcpy(window->class, class, class_size);
 
 	WNDCLASSEX wc = {0};
@@ -67,17 +73,20 @@ unsigned char graphic_register_window(Window* window, const char* class) {
 	wc.lpfnWndProc = WindowProc;
 	wc.hInstance = hInstance;
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1); 
+	wc.hbrBackground = NULL; 
 	wc.lpszClassName = window->class;
 
 	unsigned char status = (RegisterClassEx(&wc) == 0) ? ((GetLastError() != ERROR_CLASS_ALREADY_EXISTS) ? 1 : 0) : 0;
-	if(status)memset(window->class, 0, WINDOW_MAX_CLASS_SIZE);
+	if(status){
+		free(window->class);
+		window->class = NULL;
+	}
 	return status;
 }
 
 // Graphic | Creates a Window | 0 = Success
 unsigned char graphic_create_window(Window* window, const char* name, long window_style, const long x, const long y, const long width, const long height) {
-	if (!window && window->hwnd) return 1;
+	if (!window || window->hwnd) return 1;
 	if(!hInstance)return 1;
 	window->hwnd = CreateWindowEx(
 		0,
@@ -92,8 +101,15 @@ unsigned char graphic_create_window(Window* window, const char* name, long windo
 
 // Graphic | Show/Hidde a Window | 0 = Success
 unsigned char graphic_show_window(Window* window, const unsigned char show) {
-	if (!window && !window->hwnd) return 1;
+	if (!window || !window->hwnd) return 1;
 	ShowWindow(window->hwnd, (show == 1) ? SW_SHOW : SW_HIDE);
+	return 0;
+}
+
+unsigned char graphic_set_pos_window(Window* window, uVec2 pos){
+	if(!window)return 1;
+	SetWindowPos(window->hwnd, NULL, pos.x, pos.y, NULL, NULL, SWP_NOSIZE | SWP_NOZORDER);
+	UpdateWindow(window->hwnd);
 	return 0;
 }
 
