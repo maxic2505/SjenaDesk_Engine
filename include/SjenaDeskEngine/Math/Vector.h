@@ -18,8 +18,9 @@ float inv_sqrt(float len2);
 
 
 
-typedef struct Vec2{
-    float x,y;
+typedef union{
+    unsigned long long raw;
+    struct{float x,y;};
 }Vec2;
 
 // Vector2 | Math | Vec2 + Vec2
@@ -64,8 +65,9 @@ Vec3 vec3_normalize(Vec3 vec);
 
 
 
-typedef struct uVec2{
-    unsigned int x,y;
+typedef union{
+    unsigned long long raw;
+    struct{unsigned int x,y;};
 }uVec2;
 
 // unsigned Vector2 | Math | Vec2 + Vec2
