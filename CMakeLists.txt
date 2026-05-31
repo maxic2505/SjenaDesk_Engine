@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(Engine LANGUAGES C)
 
-# Main
-add_executable(Engine main.c)
-
 # Engine - Universal
 target_sources(Engine PRIVATE
     src/SjenaDeskEngine/Graphics/Graphics.c
