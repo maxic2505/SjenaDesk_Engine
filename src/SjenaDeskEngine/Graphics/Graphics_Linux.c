@@ -4,13 +4,13 @@
 
 #if defined(__linux__)
 
-unsigned char graphic_render_text(Object* object, HDC* hdc, HBRUSH* brush) {
+unsigned char graphic_render_text() {
 	return 0;
 }
-unsigned char graphic_render_button(Object* object, HDC* hdc, HBRUSH* brush) {
+unsigned char graphic_render_button() {
 	return 0;
 }
-unsigned char graphic_render_object(Object* object, HDC* hdc, HBRUSH* brush) {
+unsigned char graphic_render_object() {
 	return 0;
 }
 
