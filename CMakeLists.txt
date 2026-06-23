@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10.0)
 project(SjenaDesk_Engine LANGUAGES C)
 
-add_library(${PROJECT_NAME} SHARED)
+add_library(${PROJECT_NAME} PRIVATE)
 
 # Engine - Universal
 target_sources(${PROJECT_NAME} PRIVATE

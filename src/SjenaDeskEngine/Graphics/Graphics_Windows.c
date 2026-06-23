@@ -32,22 +32,6 @@ Object* objects;
 
 // CALLBACK for Inputs
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	switch (uMsg) {
-		case WM_PAINT : {
-			PAINTSTRUCT ps = { 0 };
-			HDC hdc = BeginPaint(hwnd, &ps);
-			RECT r = {
-				.bottom = 5,
-				.left = 5,
-				.right = 105,
-				.top = 105
-			};
-			HBRUSH br = CreateSolidBrush(RGB(255, 0, 0));
-			FillRect(hdc, &r, br);
-			EndPaint(hwnd, &ps);
-			DeleteObject(br);
-		}
-	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 

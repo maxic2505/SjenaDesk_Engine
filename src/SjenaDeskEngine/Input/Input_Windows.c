@@ -146,7 +146,7 @@ unsigned char input_key_handler_api() {
 
 uVec2 input_mouse_get_position() {
     POINT point;
-    return (GetCursorPos(&point) != 0) ? (uVec2) { point.x, point.y} : (uVec2) {0, 0};
+    return (GetCursorPos(&point) != 0) ? (uVec2) { .x = point.x, .y = point.y} : (uVec2) {.x = 0, .y = 0};
 }
 
 #endif
