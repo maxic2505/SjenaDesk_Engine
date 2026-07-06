@@ -18,9 +18,8 @@ float inv_sqrt(float len2);
 
 
 
-typedef union Vec2{
-    unsigned long long raw;
-    struct{float x,y;};
+typedef struct Vec2{
+    float x,y;
 }Vec2;
 
 // Vector2 | Math | Vec2 + Vec2
@@ -44,6 +43,15 @@ Vec2 vec2_normalize(Vec2 vec);
 
 typedef struct Vec3{
     float x,y,z;
+
+#ifdef __cplusplus
+    Vec3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z){}
+    Vec3 operator+(const Vec3 &other);
+    Vec3 operator-(const Vec3 &other);
+    Vec3 operator*(const Vec3 &other);
+    Vec3 lerp(const Vec3 &other, float dt);
+    Vec3 normalize();
+#endif
 }Vec3;
 
 // Vector3 | Math | Vec3 + Vec3
@@ -65,9 +73,14 @@ Vec3 vec3_normalize(Vec3 vec);
 
 
 
-typedef union uVec2{
-    unsigned long long raw;
-    struct{unsigned int x,y;};
+typedef struct uVec2{
+    unsigned int x,y;
+
+#ifdef __cplusplus
+    uVec2(unsigned int x = 0, unsigned int y = 0) : x(x), y(y){}
+    uVec2 operator+(const uVec2 &other);
+    uVec2 operator-(const uVec2 &other);
+#endif
 }uVec2;
 
 // unsigned Vector2 | Math | Vec2 + Vec2
@@ -82,6 +95,12 @@ uVec2 uvec2_subtract(uVec2 a, uVec2 b);
 
 typedef struct uVec3{
     unsigned int x,y,z;
+
+    #ifdef __cplusplus
+    uVec3(unsigned int x = 0, unsigned int y = 0, unsigned int z = 0) : x(x), y(y), z(z){}
+    uVec3 operator+(const uVec3 &other);
+    uVec3 operator-(const uVec3 &other);
+    #endif
 }uVec3;
 
 // unsigned Vector3 | Math | Vec3 + Vec3
