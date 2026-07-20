@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10.0)
-project(SjenaDesk_Engine LANGUAGES C)
+project(SjenaDesk_Engine LANGUAGES C CXX)
 
 add_library(${PROJECT_NAME} STATIC)
 
@@ -7,7 +7,7 @@ add_library(${PROJECT_NAME} STATIC)
 target_sources(${PROJECT_NAME} PRIVATE
     src/SjenaDeskEngine/Graphics/Graphics.c
     src/SjenaDeskEngine/Input/Input.c
-    src/SjenaDeskEngine/Math/Vector.c
+    src/SjenaDeskEngine/Math/Vector.cpp
     src/SjenaDeskEngine/Core.c
 )
 

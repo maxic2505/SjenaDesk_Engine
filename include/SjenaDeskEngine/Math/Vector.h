@@ -20,6 +20,13 @@ float inv_sqrt(float len2);
 
 typedef struct Vec2{
     float x,y;
+#ifdef __cplusplus
+    Vec2 operator+(const Vec2 &other)const;
+    Vec2 operator-(const Vec2 &other)const;
+    Vec2 operator*(const float multiplier)const;
+    Vec2 lerp(Vec2 &other, float dt);
+    Vec2 normalize();
+#endif
 }Vec2;
 
 // Vector2 | Math | Vec2 + Vec2
@@ -45,11 +52,10 @@ typedef struct Vec3{
     float x,y,z;
 
 #ifdef __cplusplus
-    Vec3(float x = 0, float y = 0, float z = 0) : x(x), y(y), z(z){}
-    Vec3 operator+(const Vec3 &other);
-    Vec3 operator-(const Vec3 &other);
-    Vec3 operator*(const Vec3 &other);
-    Vec3 lerp(const Vec3 &other, float dt);
+    Vec3 operator+(const Vec3 &other)const;
+    Vec3 operator-(const Vec3 &other)const;
+    Vec3 operator*(const float multiplier)const;
+    Vec3 lerp(Vec3 &other, float dt);
     Vec3 normalize();
 #endif
 }Vec3;
@@ -77,9 +83,8 @@ typedef struct uVec2{
     unsigned int x,y;
 
 #ifdef __cplusplus
-    uVec2(unsigned int x = 0, unsigned int y = 0) : x(x), y(y){}
-    uVec2 operator+(const uVec2 &other);
-    uVec2 operator-(const uVec2 &other);
+    uVec2 operator+(const uVec2 &other)const;
+    uVec2 operator-(const uVec2 &other)const;
 #endif
 }uVec2;
 
@@ -97,9 +102,8 @@ typedef struct uVec3{
     unsigned int x,y,z;
 
     #ifdef __cplusplus
-    uVec3(unsigned int x = 0, unsigned int y = 0, unsigned int z = 0) : x(x), y(y), z(z){}
-    uVec3 operator+(const uVec3 &other);
-    uVec3 operator-(const uVec3 &other);
+    uVec3 operator+(const uVec3 &other)const;
+    uVec3 operator-(const uVec3 &other)const;
     #endif
 }uVec3;
 

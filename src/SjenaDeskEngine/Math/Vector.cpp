@@ -38,6 +38,10 @@ float inv_sqrt(float len2){
     return inv_len;
 }
 
+
+
+
+
 Vec2 vec2_add(Vec2 a, Vec2 b){
     return (Vec2){
         .x = a.x + b.x,
@@ -77,7 +81,25 @@ Vec2 vec2_normalize(Vec2 vec){
     };
 }
 
+Vec2 Vec2::operator+(const Vec2 &other)const{
+    return vec2_add(*this, other);
+}
 
+Vec2 Vec2::operator-(const Vec2 &other)const{
+    return vec2_subtract(*this, other);
+}
+
+Vec2 Vec2::operator*(const float multiplier)const{
+    return vec2_multiply(*this, multiplier);
+}
+
+Vec2 Vec2::lerp(Vec2 &other, float dt){
+    return vec2_lerp(this, &other, dt);
+}
+
+Vec2 Vec2::normalize(){
+    return vec2_normalize(*this);
+}
 
 
 
@@ -125,6 +147,26 @@ Vec3 vec3_normalize(Vec3 vec){
     };
 }
 
+Vec3 Vec3::operator+(const Vec3 &other)const{
+    return vec3_add(*this, other);
+}
+
+Vec3 Vec3::operator-(const Vec3 &other)const{
+    return vec3_subtract(*this, other);
+}
+
+Vec3 Vec3::operator*(const float multiplier)const{
+    return vec3_multiply(*this, multiplier);
+}
+
+Vec3 Vec3::lerp(Vec3 &other, float dt){
+    return vec3_lerp(this, &other, dt);
+}
+
+Vec3 Vec3::normalize(){
+    return vec3_normalize(*this);
+}
+
 
 
 
@@ -141,6 +183,14 @@ uVec2 uvec2_subtract(uVec2 a, uVec2 b) {
         .x = a.x - b.x,
         .y = a.y - b.y
     };
+}
+
+uVec2 uVec2::operator+(const uVec2 &other)const{
+    return uvec2_add(*this, other);
+}
+
+uVec2 uVec2::operator-(const uVec2 &other)const{
+    return uvec2_subtract(*this, other);
 }
 
 
@@ -161,4 +211,12 @@ uVec3 uvec3_subtract(uVec3 a, uVec3 b) {
         .y = a.y - b.y,
         .z = a.z - b.z
     };
+}
+
+uVec3 uVec3::operator+(const uVec3 &other)const{
+    return uvec3_add(*this, other);
+}
+
+uVec3 uVec3::operator-(const uVec3 &other)const{
+    return uvec3_subtract(*this, other);
 }
