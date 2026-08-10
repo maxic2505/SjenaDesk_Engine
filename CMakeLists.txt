@@ -13,7 +13,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 # Engine - Windows
 if(WIN32)
-    target_sources(${PROJECT_NAME} PRIVATE src/SjenaDeskEngine/Graphics/Graphics_Windows.c)
+    target_sources(${PROJECT_NAME} PRIVATE src/SjenaDeskEngine/Graphics/Graphics_Windows.cpp)
     target_sources(${PROJECT_NAME} PRIVATE src/SjenaDeskEngine/Input/Input_Windows.c)
 endif()
 

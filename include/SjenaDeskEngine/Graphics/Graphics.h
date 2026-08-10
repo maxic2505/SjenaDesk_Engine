@@ -51,16 +51,23 @@ typedef struct Button {
 }Button;
 
 typedef struct Window {
+	char* class_name;
+	Object* objects;
+	unsigned long long size;
+
 	#if defined(_WIN32)
 	HWND hwnd;
 	#elif defined(__linux__)
 	void* hwnd;
 	#endif
 
-	char* class;
-
-	Object* objects;
-	unsigned long long size;
+	#ifdef __cplusplus
+	unsigned char register_window	(const char* class_name);
+	unsigned char create			(const char* name, long window_style, const long x, const long y, const long width, const long height);
+	unsigned char set_visibility	(const unsigned char visibility);
+	unsigned char set_pos			(uVec2 pos);
+	unsigned char destroy			();
+	#endif
 }Window;
 
 #ifdef __cplusplus
@@ -69,10 +76,10 @@ extern "C"{
 // Test required | Undone
 typedef unsigned char (*Graphics_Input_Callback)(int value);
 
-unsigned char graphic_register_window	(Window* window, const char* class);
+unsigned char graphic_register_window	(Window* window, const char* class_name);
 unsigned char graphic_create_window		(Window* window, const char* name, long window_style, const long x, const long y, const long width, const long height);
-unsigned char graphic_show_window		(Window* window, const unsigned char show);
-unsigned char graphic_set_pos_window(Window* window, uVec2 pos);
+unsigned char graphic_set_visibility	(Window* window, const unsigned char visibility);
+unsigned char graphic_set_pos_window	(Window* window, uVec2 pos);
 unsigned char graphic_destroy_window	(Window* window);
 
 unsigned char graphic_create_text		(Object* object, uVec2 position, uVec2 size, const char* text, Text* properties, Extra extra, unsigned int id);
