@@ -34,6 +34,12 @@ typedef struct Object {
 	unsigned long long extra;
 	uVec2 position, size;
 	unsigned int type, id;
+	#ifdef __cplusplus
+	unsigned char create(Color* color);
+	unsigned char create_text(uVec2 position, uVec2 size, const char* text, Text* properties, Extra extra, unsigned int id);
+	unsigned char create_button(uVec2 position, uVec2 size, void* data, size_t data_size, Button* properties, Extra extra, unsigned int id);
+	unsigned char destroy();
+	#endif
 }Object;
 
 typedef struct Text {
@@ -87,7 +93,6 @@ unsigned char graphic_create_button		(Object* object, uVec2 position, uVec2 size
 unsigned char graphic_create_object		(Object* object, Color* color);
 unsigned char graphic_destroy_object	(Object* object);
 
-unsigned char graphic_get_object_type   (Object* object);
 unsigned char graphic_register_object	(Object* object, Object* dst, unsigned char size);
 unsigned char graphic_remove_object		(Object* object, Object* src, unsigned char size);
 

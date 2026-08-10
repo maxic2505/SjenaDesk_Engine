@@ -5,7 +5,7 @@ add_library(${PROJECT_NAME} STATIC)
 
 # Engine - Universal
 target_sources(${PROJECT_NAME} PRIVATE
-    src/SjenaDeskEngine/Graphics/Graphics.c
+    src/SjenaDeskEngine/Graphics/Graphics.cpp
     src/SjenaDeskEngine/Input/Input.c
     src/SjenaDeskEngine/Math/Vector.cpp
     src/SjenaDeskEngine/Core.c
