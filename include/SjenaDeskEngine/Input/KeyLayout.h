@@ -90,7 +90,7 @@ typedef enum{
 } KeyCode;
 
 typedef struct Key{
-    unsigned state;
+    unsigned char state;
     unsigned char isPressed;
     unsigned char isConsumed;
 } Key;

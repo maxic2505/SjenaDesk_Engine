@@ -32,6 +32,11 @@ extern "C"{
 
 typedef struct Input{
     Key key[KEYS_AVAILABLE];
+    #ifdef __cplusplus
+    unsigned char get_key(const int keycode);
+    unsigned char get_key_down(const int keycode);
+    unsigned char get_key_up(const int keycode);
+    #endif
 }Input;
 
 unsigned char getKey(const int keycode);
