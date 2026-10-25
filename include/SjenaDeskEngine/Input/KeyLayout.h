@@ -1,96 +1,89 @@
 #pragma once
-
-enum KEYSTATE{
-    NONE,
-    UP,
-    DOWN
-};
-
-// KEYMAP
-typedef enum{
+// MAPS
+typedef enum KeyCode : unsigned long long{
     // NUMMER
-
-    KEYCODE_0,
-    KEYCODE_1,
-    KEYCODE_2,
-    KEYCODE_3,
-    KEYCODE_4,
-    KEYCODE_5,
-    KEYCODE_6,
-    KEYCODE_7,
-    KEYCODE_8,
-    KEYCODE_9,
+    KEYCODE_0 = 1ULL<<0,
+    KEYCODE_1 = 1ULL<<1,
+    KEYCODE_2 = 1ULL<<2,
+    KEYCODE_3 = 1ULL<<3,
+    KEYCODE_4 = 1ULL<<4,
+    KEYCODE_5 = 1ULL<<5,
+    KEYCODE_6 = 1ULL<<6,
+    KEYCODE_7 = 1ULL<<7,
+    KEYCODE_8 = 1ULL<<8,
+    KEYCODE_9 = 1ULL<<9,
 
     // ABC
-
-    KEYCODE_A,
-    KEYCODE_B,
-    KEYCODE_C,
-    KEYCODE_D,
-    KEYCODE_E,
-    KEYCODE_F,
-    KEYCODE_G,
-    KEYCODE_H,
-    KEYCODE_I,
-    KEYCODE_J,
-    KEYCODE_K,
-    KEYCODE_L,
-    KEYCODE_M,
-    KEYCODE_N,
-    KEYCODE_O,
-    KEYCODE_P,
-    KEYCODE_Q,
-    KEYCODE_R,
-    KEYCODE_S,
-    KEYCODE_T,
-    KEYCODE_U,
-    KEYCODE_V,
-    KEYCODE_W,
-    KEYCODE_X,
-    KEYCODE_Y,
-    KEYCODE_Z,
-
-    // SPECIAL_KEYS
-
-    KEYCODE_ENTER,
-    KEYCODE_SPACE,
-    KEYCODE_BACKSPACE,
-    KEYCODE_LEFT_META,
-    KEYCODE_RIGHT_META,
-    KEYCODE_LEFT_CTRL,
-    KEYCODE_RIGHT_CTRL,
-    KEYCODE_LEFT_ALT,
-    KEYCODE_RIGHT_ALT,
-    KEYCODE_ESC,
-    KEYCODE_TAB,
-
-    // ARROW_KEYS
-
-    ARROW_DOWN,
-    ARROW_LEFT,
-    ARROW_RIGHT,
-    ARROW_UP,
+    KEYCODE_A = 1ULL<<10,
+    KEYCODE_B = 1ULL<<11,
+    KEYCODE_C = 1ULL<<12,
+    KEYCODE_D = 1ULL<<13,
+    KEYCODE_E = 1ULL<<14,
+    KEYCODE_F = 1ULL<<15,
+    KEYCODE_G = 1ULL<<16,
+    KEYCODE_H = 1ULL<<17,
+    KEYCODE_I = 1ULL<<18,
+    KEYCODE_J = 1ULL<<19,
+    KEYCODE_K = 1ULL<<20,
+    KEYCODE_L = 1ULL<<21,
+    KEYCODE_M = 1ULL<<22,
+    KEYCODE_N = 1ULL<<23,
+    KEYCODE_O = 1ULL<<24,
+    KEYCODE_P = 1ULL<<25,
+    KEYCODE_Q = 1ULL<<26,
+    KEYCODE_R = 1ULL<<27,
+    KEYCODE_S = 1ULL<<28,
+    KEYCODE_T = 1ULL<<29,
+    KEYCODE_U = 1ULL<<30,
+    KEYCODE_V = 1ULL<<31,
+    KEYCODE_W = 1ULL<<32,
+    KEYCODE_X = 1ULL<<33,
+    KEYCODE_Y = 1ULL<<34,
+    KEYCODE_Z = 1ULL<<35,
 
     // FN_KEYS
+    KEYCODE_F1  = 1ULL<<36,
+    KEYCODE_F2  = 1ULL<<37,
+    KEYCODE_F3  = 1ULL<<38,
+    KEYCODE_F4  = 1ULL<<39,
+    KEYCODE_F5  = 1ULL<<40,
+    KEYCODE_F6  = 1ULL<<41,
+    KEYCODE_F7  = 1ULL<<42,
+    KEYCODE_F8  = 1ULL<<43,
+    KEYCODE_F9  = 1ULL<<44,
+    KEYCODE_F10 = 1ULL<<45,
+    KEYCODE_F11 = 1ULL<<46,
+    KEYCODE_F12 = 1ULL<<47,
 
-    KEYCODE_F1,
-    KEYCODE_F2,
-    KEYCODE_F3,
-    KEYCODE_F4,
-    KEYCODE_F5,
-    KEYCODE_F6,
-    KEYCODE_F7,
-    KEYCODE_F8,
-    KEYCODE_F9,
+    // ARROW_KEYS
+    ARROW_DOWN  = 1ULL<<48,
+    ARROW_LEFT  = 1ULL<<49,
+    ARROW_RIGHT = 1ULL<<50,
+    ARROW_UP    = 1ULL<<51,
 
-    // MOUSE
-    MOUSE_LEFT,
-    MOUSE_RIGHT,
-    MOUSE_MIDDLE
+    // SPECIAL_KEYS
+    KEYCODE_ENTER      = 1ULL<<52,
+    KEYCODE_SPACE      = 1ULL<<53,
+    KEYCODE_BACKSPACE  = 1ULL<<54,
+    KEYCODE_LEFT_META  = 1ULL<<56,
+    KEYCODE_RIGHT_META = 1ULL<<57,
+    KEYCODE_LEFT_CTRL  = 1ULL<<58,
+    KEYCODE_RIGHT_CTRL = 1ULL<<59,
+    KEYCODE_LEFT_ALT   = 1ULL<<60,
+    KEYCODE_RIGHT_ALT  = 1ULL<<61,
+    KEYCODE_ESC        = 1ULL<<62,
+    KEYCODE_TAB        = 1ULL<<63,
 } KeyCode;
 
-typedef struct Key{
-    unsigned char state;
-    unsigned char isPressed;
-    unsigned char isConsumed;
-} Key;
+#define MODIFIER_KEYS (KEYCODE_LEFT_CTRL | KEYCODE_RIGHT_CTRL | KEYCODE_LEFT_ALT | KEYCODE_RIGHT_ALT)
+
+typedef enum MouseEvent{
+    LEFT_BTN_PRESSED   = 1<<0,
+    MIDDLE_BTN_PRESSED = 1<<1,
+    RIGHT_BTN_PRESSED  = 1<<2,
+    LEFT_BTN_STATE     = 1<<3,
+    MIDDLE_BTN_STATE   = 1<<4,
+    RIGHT_BTN_STATE    = 1<<5,
+    SENSOR_EVENT       = 1<<6,
+    SCROLL_EVENT       = 1<<7
+}MouseEvent;

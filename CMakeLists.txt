@@ -6,7 +6,7 @@ add_library(${PROJECT_NAME} STATIC)
 # Engine - Universal
 target_sources(${PROJECT_NAME} PRIVATE
     src/SjenaDeskEngine/Graphics/Graphics.cpp
-    src/SjenaDeskEngine/Input/Input.c
+    src/SjenaDeskEngine/Input/Input.cpp
     src/SjenaDeskEngine/Math/Vector.cpp
     src/SjenaDeskEngine/Core.c
 )
@@ -14,7 +14,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 # Engine - Windows
 if(WIN32)
     target_sources(${PROJECT_NAME} PRIVATE src/SjenaDeskEngine/Graphics/Graphics_Windows.cpp)
-    target_sources(${PROJECT_NAME} PRIVATE src/SjenaDeskEngine/Input/Input_Windows.c)
+    target_sources(${PROJECT_NAME} PRIVATE src/SjenaDeskEngine/Input/Input_Windows.cpp)
 endif()
 
 
