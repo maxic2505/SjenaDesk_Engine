@@ -1,11 +1,10 @@
 #pragma once
 
+#include "SjenaDeskEngine/Graphics/Graphics.h"
 #include "SjenaDeskEngine/Input/KeyLayout.h"
 #include "SjenaDeskEngine/Math/Vector.h"
 
-
-
-
+#define SJENADESK_INPUT_LIB 1
 
 #ifdef __linux__
 #include <linux/input.h>
@@ -17,10 +16,6 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-
-
-
-
 
 #ifdef __cplusplus
 extern "C"{
@@ -109,6 +104,9 @@ unsigned char hookmanager_destroy(HookManager* mgr);
 #endif
 
 typedef struct Device{
+    #ifdef _WIN32
+    HWND hwnd;
+    #endif
     void* data;
     DeviceHeader header;
 

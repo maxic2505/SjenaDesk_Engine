@@ -80,6 +80,7 @@ MSG msg;
 unsigned char w_event[60];
 Keyboard event;
 
+// TODO: UPDATE TO RAWINPUT
 LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     if (nCode == HC_ACTION) {
         KBDLLHOOKSTRUCT* k = (KBDLLHOOKSTRUCT*)lParam;
@@ -100,6 +101,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
     return CallNextHookEx(hook, nCode, wParam, lParam);
 }
 
+// TODO: UPDATE TO RAWINPUT & FIX MOUSE CLICK
 LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam){
     if(nCode == HC_ACTION){
         unsigned long long key_num = wParam-0x0200;
@@ -116,10 +118,10 @@ LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam){
 
         if(key_num<10 && key_num>0){
             unsigned char key_state = ((unsigned char)key_num % 3);
-            unsigned char key   = ((unsigned char)key_num / 3) + MOUSE_LEFT; 
-            if(key_state == 0)key--;
+            //unsigned char key   = ((unsigned char)key_num / 3) + MOUSE_LEFT; 
+            //if(key_state == 0)key--;
 
-            input_key_callback(key, (key_state == 2) ? 0 : 1);
+            //input_key_callback(key, (key_state == 2) ? 0 : 1);
         }
     }
     return CallNextHookEx(mouse_hook, nCode, wParam, lParam);

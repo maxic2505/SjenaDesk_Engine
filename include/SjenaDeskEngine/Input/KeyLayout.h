@@ -1,5 +1,6 @@
 #pragma once
 // MAPS
+#define KEYCODE_SIZE_IN_BITS 64
 typedef enum KeyCode : unsigned long long{
     // NUMMER
     KEYCODE_0 = 1ULL<<0,

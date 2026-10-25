@@ -72,21 +72,21 @@ int input_key_callback(KeyCode code, int value){
     if(!keyboard->get_key_consumed(code))return 0; // Value 0 => KEY NOT CONSUMED
     keyboard->set_key_consumed(code, 0);
 
-    keyboard->set_key_state(code, (value > 0) ? 1 : 0);
+    keyboard->set_key(code, (value > 0) ? 1 : 0);
 
     if(is_modifier(code)){
         switch(value){
             case 0:  
-                keyboard->set_key_up(code);
+                keyboard->set_key_state_up(code);
             return 1;
             case 1:  
-                keyboard->set_key_down(code);
+                keyboard->set_key_state_down(code);
             return 1;
             case 2:  
-                keyboard->set_key_down(code);
+                keyboard->set_key_state_down(code);
             return 1;
             default: 
-                keyboard->set_key_up(code);
+                keyboard->set_key_state_up(code);
             return -1;
         }
         return 0;
@@ -97,21 +97,32 @@ int input_key_callback(KeyCode code, int value){
     // 2 = HELD
     switch(value){
         // Turning up
-        case 0:  input.key[code].state = (keyboard->get_key_up(code)) ? 0 : 1; return 2;
+        case 0:
+            if(keyboard->get_key_up(code))keyboard->remove_state(code);
+            else keyboard->set_key_state_up(code);
+        return 2;
         // Turning Down
-        case 1:  input.key[code].state = (getKeyDown(code)) ? 0 : 2; return 2;
+        case 1:
+            if(keyboard->get_key_down(code))keyboard->remove_state(code);
+            else keyboard->set_key_state_down(code);
+        return 2;
         // Nothing is happenning
-        case 2:  keyboard->remove_state(code); return 2;
-        default: keyboard->remove_state(code); return -2;
+        case 2:
+            keyboard->remove_state(code);
+        return 2;
+        default:
+            keyboard->remove_state(code);
+        return -2;
     }
 }
 void input_reset(){
-    for(int i = 0; i<KEYS_AVAILABLE;i++){
-        // Set Consumed Because of non Sync Platforms like Windows
-        input.key[i].isConsumed = 1;
+    KeyCode code = (KeyCode)(1ULL<<0);
+    for(int i = 0; i<KEYCODE_SIZE_IN_BITS;i++){
+        // Set Consumed Because of A-Sync Platforms like Windows
+        keyboard->set_key_consumed(code, 1);
 
         // ONE SHOT KEYS RESET
-        if(is_modifier(i)) continue;
-        input.key[i].state = 0;
+        if(!is_modifier(code))keyboard->remove_state(code);
+        code = (KeyCode)((unsigned long long)code<<1);
     }
 }

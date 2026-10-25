@@ -2,7 +2,10 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include "SjenaDeskEngine/Input/Input.h"
 #include "SjenaDeskEngine/Math/Vector.h"
+
+#define SJENADESK_WINDOW_LIB 1
 
 #define WINDOW_MAX_CLASS_SIZE 24
 #define OBJECT_TYPE_BUTTON 6

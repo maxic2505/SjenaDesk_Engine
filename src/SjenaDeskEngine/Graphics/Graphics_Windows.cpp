@@ -6,6 +6,7 @@
 HINSTANCE hInstance = {0};
 Object* objects;
 
+// https://learn.microsoft.com/de-de/windows/win32/api/winuser/nc-winuser-wndproc
 // CALLBACK for Inputs
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
