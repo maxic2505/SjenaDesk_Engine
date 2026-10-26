@@ -62,11 +62,14 @@ typedef struct Mouse{
 }Mouse;
 
 typedef enum DeviceHeader{
-    STATUS        = 1<<0,
-    TYPE_MOUSE    = 1<<1,
-    TYPE_KEYBOARD = 1<<2,
-    TYPE_JOYSTICK = 1<<3,
-    TYPE_UNKNOWN  = 1<<4,
+    STATUS          = 1<<0,
+    TYPE_MOUSE      = 1<<1,
+    TYPE_KEYBOARD   = 1<<2,
+    TYPE_JOYSTICK   = 1<<3,
+    TYPE_UNKNOWN    = 1<<4,
+    BACKGROUND      = 1<<5,
+    IS_ACTIVE       = 1<<6,
+    IS_FOREGROUND   = 1<<7
 }DeviceHeader;
 
 #ifdef _WIN32
