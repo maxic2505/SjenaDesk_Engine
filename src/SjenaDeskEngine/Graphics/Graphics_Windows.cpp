@@ -8,7 +8,8 @@
 typedef struct HWND_SLOT{
 	HWND hwnd;
 	Window_Message msg_ptr;
-	unsigned long long flags;
+	void* msg_class_ptr;
+	WINDOW_MSG_CODE flags;
 }HWND_SLOT;
 
 typedef struct HWND_MGR{
@@ -29,11 +30,11 @@ typedef struct HWND_MGR{
 		}
 		return NULL;
 	}
-	unsigned char add(HWND hwnd, Window_Message msg_ptr, WINDOW_MSG_CODE flags){
+	unsigned char add(HWND hwnd, Window_Message msg_ptr, void* msg_class_ptr, WINDOW_MSG_CODE flags){
 		if(!hwnd || !msg_ptr) return 1;
 		void* ptr = realloc(data, (size+1) * sizeof(HWND_SLOT));
 		if(!ptr)return 4;
-		((HWND_SLOT*)ptr)[size++] = HWND_SLOT{hwnd = hwnd, msg_ptr = msg_ptr, flags = flags};
+		((HWND_SLOT*)ptr)[size++] = HWND_SLOT{hwnd, msg_ptr, msg_class_ptr, flags};
 		data = (HWND_SLOT*)ptr;
 		return 0;
 	};
@@ -65,7 +66,7 @@ HWND_MGR mgr = {0};
 // https://learn.microsoft.com/de-de/windows/win32/api/winuser/nc-winuser-wndproc
 // CALLBACK for Inputs
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
-	Window_Message ptr = mgr.get_msg_ptr_by_hwnd(hwnd);
+	HWND_SLOT* ptr = mgr.get_slot_by_hwnd(hwnd);
 	if(ptr){
 		switch (uMsg){
 		//CYCLE
@@ -87,9 +88,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		
 		// RAWINPUT
 		case WM_INPUT: 
-			// 0 RIM_INPUT FOREGROUND / 1 RIM_INPUTSINK !FOREGROUND // GET_RAWINPUT_CODE_WPARAM(wParam)
-			unsigned long long code = 0ULL | RAW_INPUT | ((GET_RAWINPUT_CODE_WPARAM(wParam) == RIM_INPUT) ? MSG_FOREGROUND : MSG_BACKGROUND);
-			// GetRawInputData(handle to RI struct from lParam in WM_INPUT, RID_HEADER | RID_INPUT, RAWINPUT ptr, sizeof(RAWINPUT) || HID variable, sizeof(RAWINPUTHEADER))
+			ptr->msg_ptr(ptr->msg_class_ptr, wParam, lParam);
 		break;
 		case WM_INPUT_DEVICE_CHANGE: break;
 		default:break;
@@ -132,7 +131,7 @@ unsigned char Window::register_window(const char* class_name){
 }
 
 // Graphic | Creates a Window | 0 = Success
-unsigned char Window::create(Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height){
+unsigned char Window::create(Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height){
 	if (this->hwnd) return 1;
 	this->hwnd = CreateWindowExA(
 		0,
@@ -142,7 +141,7 @@ unsigned char Window::create(Window_Message msg, WINDOW_MSG_CODE flags, const ch
 		x, y, width, height,
 		NULL, NULL, GetModuleHandle(NULL), NULL);
 	if (!this->hwnd) return 1;
-	mgr.add(hwnd, msg, flags);
+	mgr.add(hwnd, msg, msg_class, flags);
 	return 0;
 }
 
@@ -190,8 +189,8 @@ unsigned char graphic_register_window(Window* window, const char* class_name) {
 }
 
 // Graphic | Creates a Window | 0 = Success
-unsigned char graphic_create_window(Window* window, Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height) {
-	return (window) ? window->create(msg, flags, name, window_style, x, y, width, height) : 1;
+unsigned char graphic_create_window(Window* window, Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height) {
+	return (window) ? window->create(msg, msg_class, flags, name, window_style, x, y, width, height) : 1;
 }
 
 // Graphic | Show/Hidde a Window | 0 = Success

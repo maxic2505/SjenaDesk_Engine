@@ -59,29 +59,28 @@ typedef struct Button {
 	Color color_border;
 }Button;
 
-typedef unsigned char(*Window_Message)(unsigned long long code, unsigned long long data, void* ptr);
+typedef unsigned char(*Window_Message)(void* class_ptr, unsigned long long code, unsigned long long data);
 
-typedef enum WINDOW_MSG_CODE: unsigned long long{
-	MSG_INPUT,
-	MSG_CYCLE_CREATE,
-	MSG_CHAR,
-	MSG_WINDOW_MOVE,
-	MSG_WINDOW_SIZE,
-	MSG_WINDOW_PAINT,
-	MSG_WINDOW_ACTIVATE,
-	MSG_WINDOW_SETFOCUS,
-	MSG_WINDOW_KILLFOCUS,
-
-	INPUT_MOUSE_DATA	= 1ULL<<0,
-	INPUT_KEYBOARD_DATA	= 1ULL<<1,
-	INPUT_JOYSTICK		= 1ULL<<2,
-	MSG_FOREGROUND		= 1ULL<<2,
-	MSG_BACKGROUND		= 1ULL<<2,
-	MSG_GET_CYCLE1		= 1ULL<<2
+typedef enum WINDOW_MSG_CODE : unsigned long long{
+	MSG_INPUT			 = 1ULL<<0,
+	MSG_CYCLE_CREATE	 = 1ULL<<1,
+	MSG_CYCLE_CLOSE		 = 1ULL<<2,
+	MSG_CYCLE_DESTROY	 = 1ULL<<3,
+	MSG_CHAR			 = 1ULL<<4,
+	MSG_WINDOW_MOVE		 = 1ULL<<5,
+	MSG_WINDOW_SIZE		 = 1ULL<<6,
+	MSG_WINDOW_PAINT	 = 1ULL<<7,
+	MSG_WINDOW_ACTIVATE	 = 1ULL<<8,
+	MSG_WINDOW_SETFOCUS	 = 1ULL<<9,
+	MSG_WINDOW_KILLFOCUS = 1ULL<<10,
+	MSG_WINDOW_ENTERRESIZE = 1ULL<<11,
+	MSG_WINDOW_EXITRESIZE  = 1ULL<<12,
+	MSG_FOREGROUND		 = 1ULL<<13, 
+	MSG_BACKGROUND		 = 1ULL<<14,
 }WINDOW_MSG_CODE;
 
 #define MSG_WINDOW (MSG_WINDOW_MOVE | MSG_WINDOW_SIZE | MSG_WINDOW_PAINT | MSG_WINDOW_ACTIVATE | MSG_WINDOW_SETFOCUS | MSG_WINDOW_KILLFOCUS)
-
+#define MSG_CYCLE (MSG_CYCLE_CREATE | MSG_CYCLE_CLOSE | MSG_CYCLE_DESTROY)
 typedef struct Window {
 	char* class_name;
 	Object* objects;
@@ -95,7 +94,7 @@ typedef struct Window {
 
 	#ifdef __cplusplus
 	unsigned char register_window	(const char* class_name);
-	unsigned char create			(Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
+	unsigned char create			(Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
 	unsigned char set_visibility	(const unsigned char visibility);
 	unsigned char set_pos			(uVec2 pos);
 	unsigned char destroy			();
@@ -107,7 +106,7 @@ extern "C"{
 #endif
 
 unsigned char graphic_register_window	(Window* window, const char* class_name);
-unsigned char graphic_create_window		(Window* window, Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
+unsigned char graphic_create_window		(Window* window, Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
 unsigned char graphic_set_visibility	(Window* window, const unsigned char visibility);
 unsigned char graphic_set_pos_window	(Window* window, uVec2 pos);
 unsigned char graphic_destroy_window	(Window* window);

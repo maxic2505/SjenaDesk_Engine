@@ -74,6 +74,10 @@ unsigned long long api_key_map(int code) {
     }
 }
 
+unsigned char Input::callback(unsigned long long code, unsigned long long data){
+    return 1;
+}
+
 HHOOK hook;
 HHOOK mouse_hook;
 MSG msg;

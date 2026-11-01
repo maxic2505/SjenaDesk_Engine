@@ -39,6 +39,8 @@ typedef struct Keyboard{
     unsigned char set_key_state_up  (const KeyCode code);
     unsigned char remove_state      (const KeyCode code);
 
+    unsigned char reset();
+    unsigned char callback(KeyCode code, int value);
     #endif
 }Keyboard;
 
@@ -53,6 +55,9 @@ unsigned char keyboard_set_key_state_down   (Keyboard* keyboard, const KeyCode c
 unsigned char keyboard_set_key_state_up     (Keyboard* keyboard, const KeyCode code);
 unsigned char keyboard_remove_state         (Keyboard* keyboard, const KeyCode code);
 
+unsigned char keyboard_reset(Keyboard* keyboard);
+unsigned char keyboard_callback(Keyboard* keyboard, KeyCode code, int value);
+
 typedef struct Mouse{
     uVec2 position;
     uVec2 last_position;
@@ -62,14 +67,14 @@ typedef struct Mouse{
 }Mouse;
 
 typedef enum DeviceHeader{
-    STATUS          = 1<<0,
-    TYPE_MOUSE      = 1<<1,
-    TYPE_KEYBOARD   = 1<<2,
-    TYPE_JOYSTICK   = 1<<3,
-    TYPE_UNKNOWN    = 1<<4,
-    BACKGROUND      = 1<<5,
-    IS_ACTIVE       = 1<<6,
-    IS_FOREGROUND   = 1<<7
+    MOUSE_STATUS    = 1<<0,
+    MOUSE_BG        = 1<<1,
+    MOUSE_IN_FG     = 1<<2,
+    KEYBOARD_STATUS = 1<<3,
+    KEYBOARD_BG     = 1<<4,
+    KEYBOARD_IN_FG  = 1<<5,
+    U1              = 1<<6,
+    U2              = 1<<7,
 }DeviceHeader;
 
 #ifdef _WIN32
@@ -106,38 +111,27 @@ unsigned char hookmanager_destroy(HookManager* mgr);
 
 #endif
 
-typedef struct Device{
+typedef struct Input{
+    Keyboard keyboard;
     #ifdef _WIN32
-    HWND hwnd;
+    Keyboard temp;
     #endif
-    void* data;
+    Mouse mouse;
+
+    #ifdef _WIN32
+    HWND hWnd;
+    #endif
+
     DeviceHeader header;
 
     #ifdef __cplusplus
-    unsigned char is_ready();
-    unsigned char is_type(DeviceHeader type);
-    unsigned char setup_mouse();
-    unsigned char setup_keyboard();
+    unsigned char setup(Window* window);
     unsigned char destroy();
-    #endif
-}Device;
-
-
-typedef struct Input{
-    Device* devices;
-    unsigned int size;
-    unsigned int header;
-
-    #ifdef _WIN32
-    HookManager mgr;
-    #endif
-
-    #ifdef __cplusplus
-    unsigned char get_key(const int keycode);
-    unsigned char get_key_down(const int keycode);
-    unsigned char get_key_up(const int keycode);
+    unsigned char callback(unsigned long long code, unsigned long long data);
     #endif
 }Input;
+
+unsigned char input_callback(void* class_ptr, unsigned long long code, unsigned long long data);
 
 unsigned char getKey(const int keycode);
 unsigned char getKeyDown(const int keycode);
