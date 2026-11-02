@@ -2,6 +2,7 @@
 
 float inv_sqrt(float len2){
     if(len2 <= 0.01f)return 0;
+    float inv_len = -1.0f;
     //Newton: r * (1,5 - 0.5 * len2 * r*r)
     #if defined(USING_X86_X64)
 
@@ -16,7 +17,7 @@ float inv_sqrt(float len2){
     __m128 term   = _mm_mul_ss(h_len2 ,   r2);
     __m128 nr     = _mm_mul_ss(r      ,_mm_sub_ss(three, term));
 
-    float inv_len = _mm_cvtss_f32(nr);
+    inv_len = _mm_cvtss_f32(nr);
 
     #elif defined(USING_ARM)
 
@@ -31,7 +32,7 @@ float inv_sqrt(float len2){
     float32x2_t term = vmul_f32(h_len2, r2);
     float32x2_t nr = vmul_f32(r, vsub_f32(third, term));
 
-    float inv_len = vget_lane_f32(nr, 0);
+    inv_len = vget_lane_f32(nr, 0);
 
     #endif
 
@@ -43,30 +44,30 @@ float inv_sqrt(float len2){
 
 
 Vec2 vec2_add(Vec2 a, Vec2 b){
-    return (Vec2){
-        .x = a.x + b.x,
-        .y = a.y + b.y
+    return Vec2{
+        a.x + b.x,
+        a.y + b.y
     };
 }
 
 Vec2 vec2_subtract(Vec2 a, Vec2 b){
-    return (Vec2){
-        .x = a.x - b.x,
-        .y = a.y - b.y
+    return Vec2{
+        a.x - b.x,
+        a.y - b.y
     };
 }
 
 Vec2 vec2_multiply(Vec2 vec, float multiplier){
-    return (Vec2){
-        .x = vec.x * multiplier,
-        .y = vec.y * multiplier
+    return Vec2{
+        vec.x * multiplier,
+        vec.y * multiplier
     };
 }
 
 Vec2 vec2_lerp(Vec2* src, Vec2* dst, float dt){
-    return (Vec2){
-        .x = src->x + (dst->x - src->x)*dt,
-        .y = src->y + (dst->y - src->y)*dt
+    return Vec2{
+        src->x + (dst->x - src->x)*dt,
+        src->y + (dst->y - src->y)*dt
     };
 }
 
@@ -75,9 +76,9 @@ Vec2 vec2_normalize(Vec2 vec){
 
     float inv_len = inv_sqrt(len2);
 
-    return (Vec2) {
-        .x = inv_len * vec.x,
-        .y = inv_len * vec.y
+    return Vec2{
+        inv_len * vec.x,
+        inv_len * vec.y
     };
 }
 
@@ -104,34 +105,34 @@ Vec2 Vec2::normalize(){
 
 
 Vec3 vec3_add(Vec3 a, Vec3 b){
-    return (Vec3){
-        .x = a.x + b.x,
-        .y = a.y + b.y,
-        .z = a.z + b.z
+    return Vec3{
+        a.x + b.x,
+        a.y + b.y,
+        a.z + b.z
     };
 }
 
 Vec3 vec3_subtract(Vec3 a, Vec3 b){
-    return (Vec3){
-        .x = a.x - b.x,
-        .y = a.y - b.y,
-        .z = a.z - b.z
+    return Vec3{
+        a.x - b.x,
+        a.y - b.y,
+        a.z - b.z
     };
 }
 
 Vec3 vec3_multiply(Vec3 vec, float multiplier){
-    return (Vec3){
-        .x = vec.x*multiplier,
-        .y = vec.y*multiplier,
-        .z = vec.z*multiplier
+    return Vec3{
+        vec.x*multiplier,
+        vec.y*multiplier,
+        vec.z*multiplier
     };
 }
 
 Vec3 vec3_lerp(Vec3* src, Vec3* dst, float dt){
-    return (Vec3){
-        .x = src->x + (dst->x - src->x)*dt,
-        .y = src->y + (dst->y - src->y)*dt,
-        .z = src->z + (dst->z - src->z)*dt
+    return Vec3{
+        src->x + (dst->x - src->x)*dt,
+        src->y + (dst->y - src->y)*dt,
+        src->z + (dst->z - src->z)*dt
     };
 }
 
@@ -140,10 +141,10 @@ Vec3 vec3_normalize(Vec3 vec){
 
     float inv_len = inv_sqrt(len2);
 
-    return (Vec3) {
-        .x = inv_len * vec.x,
-        .y = inv_len * vec.y,
-        .z = inv_len * vec.z
+    return Vec3{
+        inv_len * vec.x,
+        inv_len * vec.y,
+        inv_len * vec.z
     };
 }
 
@@ -172,16 +173,16 @@ Vec3 Vec3::normalize(){
 
 
 uVec2 uvec2_add(uVec2 a, uVec2 b) {
-    return (uVec2) {
-        .x = a.x + b.x,
-        .y = a.y + b.y
+    return uVec2{
+        a.x + b.x,
+        a.y + b.y
     };
 }
 
 uVec2 uvec2_subtract(uVec2 a, uVec2 b) {
-    return (uVec2) {
-        .x = a.x - b.x,
-        .y = a.y - b.y
+    return uVec2{
+        a.x - b.x,
+        a.y - b.y
     };
 }
 
@@ -198,18 +199,18 @@ uVec2 uVec2::operator-(const uVec2 &other)const{
 
 
 uVec3 uvec3_add(uVec3 a, uVec3 b) {
-    return (uVec3) {
-        .x = a.x + b.x,
-        .y = a.y + b.y,
-        .z = a.z + b.z
+    return uVec3{
+        a.x + b.x,
+        a.y + b.y,
+        a.z + b.z
     };
 }
 
 uVec3 uvec3_subtract(uVec3 a, uVec3 b) {
-    return (uVec3) {
-        .x = a.x - b.x,
-        .y = a.y - b.y,
-        .z = a.z - b.z
+    return uVec3{
+        a.x - b.x,
+        a.y - b.y,
+        a.z - b.z
     };
 }
 
@@ -219,4 +220,58 @@ uVec3 uVec3::operator+(const uVec3 &other)const{
 
 uVec3 uVec3::operator-(const uVec3 &other)const{
     return uvec3_subtract(*this, other);
+}
+
+
+
+
+
+iVec2 ivec2_add(iVec2 a, iVec2 b){
+    return iVec2{
+        a.x + b.x,
+        a.y + b.y
+    };
+}
+
+iVec2 ivec2_subtract(iVec2 a, iVec2 b){
+    return iVec2{
+        a.x - b.x,
+        a.y - b.y
+    };
+}
+
+iVec2 iVec2::operator+(const iVec2 &other)const{
+    return ivec2_add(*this, other);
+}
+
+iVec2 iVec2::operator-(const iVec2 &other)const{
+    return ivec2_subtract(*this, other);
+}
+
+
+
+
+
+iVec3 ivec3_add(iVec3 a, iVec3 b){
+    return iVec3{
+        a.x + b.x,
+        a.y + b.y,
+        a.z + b.z
+    };
+}
+
+iVec3 ivec3_subtract(iVec3 a, iVec3 b){
+    return iVec3{
+        a.x - b.x,
+        a.y - b.y,
+        a.z - b.z
+    };
+}
+
+iVec3 iVec3::operator+(const iVec3 &other)const{
+    ivec3_add(*this, other);
+}
+
+iVec3 iVec3::operator-(const iVec3 &other)const{
+    ivec3_subtract(*this, other);
 }

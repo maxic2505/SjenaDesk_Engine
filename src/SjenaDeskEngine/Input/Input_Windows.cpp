@@ -75,7 +75,47 @@ unsigned long long api_key_map(int code) {
 }
 
 unsigned char Input::callback(unsigned long long code, unsigned long long data){
-    return 1;
+    // Get RAWINPUT Struct
+    RAWINPUT ri;
+    UINT ri_size = sizeof(ri);
+    if(GetRawInputData((HRAWINPUT)data, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) == (UINT)-1){
+        //Fehler behandlung
+        return 1;
+    }
+    switch (ri.header.dwType)
+    {
+        case RIM_TYPEMOUSE: {
+            unsigned char mouse_event = 0;
+            // Mouse Position
+            if(ri.data.mouse.usFlags & MOUSE_MOVE_RELATIVE){
+                mouse_event |= SENSOR_EVENT;
+                this->mouse.acceleration.x += ri.data.mouse.lLastX;
+                this->mouse.acceleration.y += ri.data.mouse.lLastY;
+                POINT point;
+                if(GetCursorPos(&point))
+                { this->mouse.position = iVec2{point.x, point.y}; }
+            }
+            //MouseButtons TODO
+            //if(ri.data.mouse.usButtonFlags)
+            //mouse_event |= (RI)
+            // usButtonData
+            if(ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL){
+                this->mouse.scroll_x += (short)ri.data.mouse.usButtonData;
+                mouse_event |= SCROLL_EVENT;
+            }else if(ri.data.mouse.usButtonFlags & RI_MOUSE_HWHEEL){
+                this->mouse.scroll_y += (short)ri.data.mouse.usButtonData;
+            }
+            break;
+        }
+            
+        case RIM_TYPEKEYBOARD: {
+            // TODO
+            break;
+        }
+            
+        default: break;
+    }
+    return 0;
 }
 
 HHOOK hook;

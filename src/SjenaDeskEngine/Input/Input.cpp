@@ -142,7 +142,7 @@ unsigned char Input::setup(Window* window){
 }
 
 unsigned char input_callback(void* class_ptr, unsigned long long code, unsigned long long data){
-    ((Input*)class_ptr)->callback(code, data);
+    return ((Input*)class_ptr)->callback(code, data);
 }
 
 // For APIs to set the input value

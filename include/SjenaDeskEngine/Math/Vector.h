@@ -113,6 +113,44 @@ uVec3 uvec3_add(uVec3 a, uVec3 b);
 // unsigned Vector3 | Math | Vec3 - Vec3
 uVec3 uvec3_subtract(uVec3 a, uVec3 b);
 
+
+
+
+
+typedef struct iVec2{
+    int x,y;
+
+#ifdef __cplusplus
+    iVec2 operator+(const iVec2 &other)const;
+    iVec2 operator-(const iVec2 &other)const;
+#endif
+}iVec2;
+
+// unsigned Vector2 | Math | Vec2 + Vec2
+iVec2 ivec2_add(iVec2 a, iVec2 b);
+
+// unsigned Vector2 | Math | Vec2 - Vec2
+iVec2 ivec2_subtract(iVec2 a, iVec2 b);
+
+
+
+
+
+typedef struct iVec3{
+    int x,y,z;
+
+    #ifdef __cplusplus
+    iVec3 operator+(const iVec3 &other)const;
+    iVec3 operator-(const iVec3 &other)const;
+    #endif
+}iVec3;
+
+// unsigned Vector3 | Math | Vec3 + Vec3
+iVec3 ivec3_add(iVec3 a, iVec3 b);
+
+// unsigned Vector3 | Math | Vec3 - Vec3
+iVec3 ivec3_subtract(iVec3 a, iVec3 b);
+
 #ifdef __cplusplus
 }
 #endif

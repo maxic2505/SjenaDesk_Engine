@@ -88,7 +88,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		
 		// RAWINPUT
 		case WM_INPUT: 
-			ptr->msg_ptr(ptr->msg_class_ptr, wParam, lParam);
+			ptr->msg_ptr(ptr->msg_class_ptr, wParam, (unsigned long long)lParam);
 		break;
 		case WM_INPUT_DEVICE_CHANGE: break;
 		default:break;

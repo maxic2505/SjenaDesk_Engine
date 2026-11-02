@@ -59,10 +59,10 @@ unsigned char keyboard_reset(Keyboard* keyboard);
 unsigned char keyboard_callback(Keyboard* keyboard, KeyCode code, int value);
 
 typedef struct Mouse{
-    uVec2 position;
-    uVec2 last_position;
-    Vec2 acceleration;
-    float wheel_acceleration;
+    iVec2 position;
+    iVec2 acceleration;
+    short scroll_x;
+    short scroll_y;
     MouseEvent events;
 }Mouse;
 
