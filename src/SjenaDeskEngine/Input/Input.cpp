@@ -30,6 +30,7 @@ unsigned char Keyboard::remove_state(const KeyCode code){
 }
 
 unsigned char Keyboard::reset(){
+	// Keyboard
     KeyCode code = (KeyCode)(1ULL<<0);
     for(int i = 0; i<KEYCODE_SIZE_IN_BITS;i++){
         // Set Consumed Because of A-Sync Platforms like Windows

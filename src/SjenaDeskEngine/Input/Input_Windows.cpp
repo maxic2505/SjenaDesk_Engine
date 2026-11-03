@@ -86,18 +86,25 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
     {
         case RIM_TYPEMOUSE: {
             unsigned char mouse_event = 0;
-            // Mouse Position
+            // Mouse Position & Acceleration
             if(ri.data.mouse.usFlags & MOUSE_MOVE_RELATIVE){
                 mouse_event |= SENSOR_EVENT;
+                // Reset at Input.reset() necesary
                 this->mouse.acceleration.x += ri.data.mouse.lLastX;
                 this->mouse.acceleration.y += ri.data.mouse.lLastY;
                 POINT point;
                 if(GetCursorPos(&point))
                 { this->mouse.position = iVec2{point.x, point.y}; }
             }
+
             //MouseButtons TODO
-            //if(ri.data.mouse.usButtonFlags)
+            //if(ri.data.mouse.usButtonFlags & (RI_MOUSE_BUTTON))
             //mouse_event |= (RI)
+
+            // Realtime & Client buffer necesary
+            // Realtime: Sets OWN and CLIENTSIDE at same time and releases only OWN.
+            // Clientside: Sets OWN and gets RESET by Input.reset();
+            
             // usButtonData
             if(ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL){
                 this->mouse.scroll_x += (short)ri.data.mouse.usButtonData;
