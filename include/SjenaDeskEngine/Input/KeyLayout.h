@@ -78,7 +78,7 @@ typedef enum KeyCode : unsigned long long{
 
 #define MODIFIER_KEYS (KEYCODE_LEFT_CTRL | KEYCODE_RIGHT_CTRL | KEYCODE_LEFT_ALT | KEYCODE_RIGHT_ALT)
 
-typedef enum MouseEvent{
+typedef enum MouseEvent : unsigned char{
     LEFT_BTN_PRESSED   = 1<<0,
     MIDDLE_BTN_PRESSED = 1<<1,
     RIGHT_BTN_PRESSED  = 1<<2,

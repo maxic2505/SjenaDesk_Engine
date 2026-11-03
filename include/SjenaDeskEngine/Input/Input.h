@@ -64,6 +64,7 @@ typedef struct Mouse{
     short scroll_x;
     short scroll_y;
     MouseEvent events;
+    MouseEvent realtime_events;
 }Mouse;
 
 typedef enum DeviceHeader{

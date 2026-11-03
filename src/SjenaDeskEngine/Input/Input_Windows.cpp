@@ -88,7 +88,7 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
             unsigned char mouse_event = 0;
             // Mouse Position & Acceleration
             if(ri.data.mouse.usFlags & MOUSE_MOVE_RELATIVE){
-                mouse_event |= SENSOR_EVENT;
+                this->mouse.events |= SENSOR_EVENT;
                 // Reset at Input.reset() necesary
                 this->mouse.acceleration.x += ri.data.mouse.lLastX;
                 this->mouse.acceleration.y += ri.data.mouse.lLastY;
@@ -100,6 +100,8 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
             //MouseButtons TODO
             //if(ri.data.mouse.usButtonFlags & (RI_MOUSE_BUTTON))
             //mouse_event |= (RI)
+
+            if(ri.data.mouse.usButtonFlags )
 
             // Realtime & Client buffer necesary
             // Realtime: Sets OWN and CLIENTSIDE at same time and releases only OWN.
