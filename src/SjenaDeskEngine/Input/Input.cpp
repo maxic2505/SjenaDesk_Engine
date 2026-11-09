@@ -55,12 +55,6 @@ unsigned char is_modifier(KeyCode code){
     return (code & MODIFIER_KEYS) ? 1 : 0;
 }
 
-unsigned char Input::setup(Window* window){
-    if(!window || window->hwnd)
-    memset(this, 0, sizeof(Input));
-    if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
-    return window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_CYCLE | MSG_BACKGROUND | MSG_FOREGROUND), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0);
-}
 // Don't use this
 unsigned char Input::reset(){
     // Keyboard

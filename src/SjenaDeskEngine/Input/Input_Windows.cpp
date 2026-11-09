@@ -76,6 +76,25 @@ KeyCode api_key_map(int code) {
     }
 }
 
+unsigned char Input::setup(Window* window){
+    if(!window || window->hwnd)
+    memset(this, 0, sizeof(Input));
+    if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
+    window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_CYCLE | MSG_BACKGROUND | MSG_FOREGROUND), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0);
+
+    RAWINPUTDEVICE rid[2] = {0};
+    rid[0].usUsagePage = 0x01;
+    rid[0].usUsage = 0x02;
+    rid[0].dwFlags = 0;
+    rid[0].hwndTarget = window->hwnd;
+
+    rid[1].usUsagePage = 0x01;
+    rid[1].usUsage = 0x06;
+    rid[1].dwFlags = 0;
+    rid[1].hwndTarget = window->hwnd;
+    return RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE));
+}
+
 unsigned char Input::callback(unsigned long long code, unsigned long long data){
     // Get RAWINPUT Struct
     RAWINPUT ri;
