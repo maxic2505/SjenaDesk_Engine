@@ -269,9 +269,9 @@ iVec3 ivec3_subtract(iVec3 a, iVec3 b){
 }
 
 iVec3 iVec3::operator+(const iVec3 &other)const{
-    ivec3_add(*this, other);
+    return ivec3_add(*this, other);
 }
 
 iVec3 iVec3::operator-(const iVec3 &other)const{
-    ivec3_subtract(*this, other);
+    return ivec3_subtract(*this, other);
 }

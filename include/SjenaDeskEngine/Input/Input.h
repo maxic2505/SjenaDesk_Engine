@@ -88,17 +88,6 @@ unsigned char input_callback(void* class_ptr, unsigned long long code, unsigned 
 unsigned char input_handler(Input* input);
 unsigned char input_reset(Input* input);
 
-unsigned char getKey(const int keycode);
-unsigned char getKeyDown(const int keycode);
-unsigned char getKeyUp(const int keycode);
-
-unsigned char input_key_setup_api();
-unsigned char input_key_handler_api();
-
-// DO NOT USE THIS METHODE FOR YOURSELF
-int input_key_callback(int code, int value);
-void input_reset();
-
 #ifdef __cplusplus
 }
 #endif
