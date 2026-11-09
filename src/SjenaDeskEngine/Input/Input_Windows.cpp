@@ -5,7 +5,7 @@
 #if defined(_WIN32)
 
 // KEYMAP | WINDOWS (SCANCODE)
-unsigned long long api_key_map(int code) {
+KeyCode api_key_map(int code) {
     switch (code) {
     case 0x0B: return KEYCODE_0;
     case 0x02: return KEYCODE_1;
@@ -48,17 +48,19 @@ unsigned long long api_key_map(int code) {
     case 0x1C: return KEYCODE_ENTER;
     case 0x39: return KEYCODE_SPACE;
     case 0x0E: return KEYCODE_BACKSPACE;
-    case 0x5B: return KEYCODE_LEFT_META;
-    case 0x5C: return KEYCODE_RIGHT_META;
     case 0x1D: return KEYCODE_LEFT_CTRL;
     case 0x38: return KEYCODE_LEFT_ALT;
     case 0x01: return KEYCODE_ESC;
     case 0x0F: return KEYCODE_TAB;
 
-    case 0x50: return ARROW_DOWN;
-    case 0x4B: return ARROW_LEFT;
-    case 0x4D: return ARROW_RIGHT;
-    case 0x48: return ARROW_UP;
+    case 0x11D: return KEYCODE_RIGHT_CTRL;
+    case 0x138: return KEYCODE_RIGHT_ALT;
+    case 0x15B: return KEYCODE_LEFT_META;
+    case 0x15C: return KEYCODE_RIGHT_META;
+    case 0x150: return ARROW_DOWN;
+    case 0x14B: return ARROW_LEFT;
+    case 0x14D: return ARROW_RIGHT;
+    case 0x148: return ARROW_UP;
 
     case 0x3B: return KEYCODE_F1;
     case 0x3C: return KEYCODE_F2;
@@ -70,7 +72,7 @@ unsigned long long api_key_map(int code) {
     case 0x42: return KEYCODE_F8;
     case 0x43: return KEYCODE_F9;
 
-    default:return 0;
+    default:return (KeyCode)0ULL;
     }
 }
 
@@ -85,10 +87,20 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
     switch (ri.header.dwType)
     {
         case RIM_TYPEMOUSE: {
-            unsigned char mouse_event = 0;
+            // Mouse Buttons
+            const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
+            if(usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) this->mouse.events |= LEFT_BTN_STATE | LEFT_BTN_PRESSED;
+            if(usButtonFlags & RI_MOUSE_BUTTON_1_UP) this->mouse.events = this->mouse.events & ~LEFT_BTN_STATE;
+
+            if(usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) this->mouse.events |= RIGHT_BTN_STATE | RIGHT_BTN_PRESSED;
+            if(usButtonFlags & RI_MOUSE_BUTTON_2_UP) this->mouse.events = this->mouse.events & ~RIGHT_BTN_STATE;
+
+            if(usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) this->mouse.events |= MIDDLE_BTN_STATE | MIDDLE_BTN_PRESSED;
+            if(usButtonFlags & RI_MOUSE_BUTTON_3_UP) this->mouse.events = this->mouse.events & ~MIDDLE_BTN_STATE;
+
             // Mouse Position & Acceleration
-            if(ri.data.mouse.usFlags & MOUSE_MOVE_RELATIVE){
-                this->mouse.events |= SENSOR_EVENT;
+            if(!(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)){
+                if(ri.data.mouse.lLastX || ri.data.mouse.lLastY)this->mouse.events |= SENSOR_EVENT;
                 // Reset at Input.reset() necesary
                 this->mouse.acceleration.x += ri.data.mouse.lLastX;
                 this->mouse.acceleration.y += ri.data.mouse.lLastY;
@@ -96,35 +108,40 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
                 if(GetCursorPos(&point))
                 { this->mouse.position = iVec2{point.x, point.y}; }
             }
-
-            //MouseButtons TODO
-            //if(ri.data.mouse.usButtonFlags & (RI_MOUSE_BUTTON))
-            //mouse_event |= (RI)
-
-            if(ri.data.mouse.usButtonFlags )
-
-            // Realtime & Client buffer necesary
-            // Realtime: Sets OWN and CLIENTSIDE at same time and releases only OWN.
-            // Clientside: Sets OWN and gets RESET by Input.reset();
             
             // usButtonData
-            if(ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL){
+            if(ri.data.mouse.usButtonFlags & RI_MOUSE_HWHEEL){
                 this->mouse.scroll_x += (short)ri.data.mouse.usButtonData;
-                mouse_event |= SCROLL_EVENT;
-            }else if(ri.data.mouse.usButtonFlags & RI_MOUSE_HWHEEL){
+                this->mouse.events |= SCROLL_EVENT;
+            }
+            if(ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL){
                 this->mouse.scroll_y += (short)ri.data.mouse.usButtonData;
+                this->mouse.events |= SCROLL_EVENT;
             }
             break;
         }
             
         case RIM_TYPEKEYBOARD: {
-            // TODO
+            if(ri.data.keyboard.Flags & RI_KEY_E1)break;
+            unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
+            unsigned char e0   = ri.data.keyboard.Flags & RI_KEY_E0;
+            if(e0 && (ri.data.keyboard.MakeCode == 0x2A || ri.data.keyboard.MakeCode == 0x36))break;
+            this->keyboard.callback(api_key_map(ri.data.keyboard.MakeCode | e0 ? 0x100 : 0), down);
             break;
         }
             
         default: break;
     }
     return 0;
+}
+
+unsigned char Input::handler(){
+    this->reset();
+    // Keep Windows Thread alive
+    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 }
 
 HHOOK hook;
@@ -191,19 +208,9 @@ unsigned char input_key_setup_api() {
 unsigned char input_key_handler_api() {
     input_reset();
 
-    // Keep Windows Thread alive
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+    
 
     return 0;
-}
-
-uVec2 input_mouse_get_position() {
-    // No Display is gonna past 2^32, right?
-    POINT point;
-    return (GetCursorPos(&point) != 0) ? uVec2{(unsigned int)point.x, (unsigned int)point.y} : uVec2{0, 0};
 }
 
 #endif

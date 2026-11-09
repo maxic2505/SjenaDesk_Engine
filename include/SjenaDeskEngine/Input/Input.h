@@ -25,37 +25,25 @@ extern "C"{
 typedef struct Keyboard{
     unsigned long long is_pressed_keys;
     unsigned long long pressed_states;
-    unsigned long long released_states;
-    unsigned long long consumed_states;
     #ifdef __cplusplus
     unsigned char get_key           (const KeyCode code);
-    unsigned char get_key_consumed  (const KeyCode code);
     unsigned char get_key_down      (const KeyCode code);
-    unsigned char get_key_up        (const KeyCode code);
 
     unsigned char set_key           (const KeyCode code, const unsigned char state);
-    unsigned char set_key_consumed  (const KeyCode code, const unsigned char state);
     unsigned char set_key_state_down(const KeyCode code);
-    unsigned char set_key_state_up  (const KeyCode code);
     unsigned char remove_state      (const KeyCode code);
 
-    unsigned char reset();
     unsigned char callback(KeyCode code, int value);
     #endif
 }Keyboard;
 
 unsigned char keyboard_get_key          (Keyboard* keyboard, const KeyCode code);
-unsigned char keyboard_get_key_consumed (Keyboard* keyboard, const KeyCode code);
 unsigned char keyboard_get_key_down     (Keyboard* keyboard, const KeyCode code);
-unsigned char keyboard_get_key_up       (Keyboard* keyboard, const KeyCode code);
 
 unsigned char keyboard_set_key              (Keyboard* keyboard, const KeyCode code, const unsigned char state);
-unsigned char keyboard_set_key_consumed     (Keyboard* keyboard, const KeyCode code, const unsigned char state);
 unsigned char keyboard_set_key_state_down   (Keyboard* keyboard, const KeyCode code);
-unsigned char keyboard_set_key_state_up     (Keyboard* keyboard, const KeyCode code);
 unsigned char keyboard_remove_state         (Keyboard* keyboard, const KeyCode code);
 
-unsigned char keyboard_reset(Keyboard* keyboard);
 unsigned char keyboard_callback(Keyboard* keyboard, KeyCode code, int value);
 
 typedef struct Mouse{
@@ -63,8 +51,7 @@ typedef struct Mouse{
     iVec2 acceleration;
     short scroll_x;
     short scroll_y;
-    MouseEvent events;
-    MouseEvent realtime_events;
+    unsigned char events;
 }Mouse;
 
 typedef enum DeviceHeader{
@@ -114,9 +101,6 @@ unsigned char hookmanager_destroy(HookManager* mgr);
 
 typedef struct Input{
     Keyboard keyboard;
-    #ifdef _WIN32
-    Keyboard temp;
-    #endif
     Mouse mouse;
 
     #ifdef _WIN32
@@ -129,16 +113,18 @@ typedef struct Input{
     unsigned char setup(Window* window);
     unsigned char destroy();
     unsigned char callback(unsigned long long code, unsigned long long data);
+    unsigned char handler();
+    unsigned char reset();
     #endif
 }Input;
 
 unsigned char input_callback(void* class_ptr, unsigned long long code, unsigned long long data);
+unsigned char input_handler(Input* input);
+unsigned char input_reset(Input* input);
 
 unsigned char getKey(const int keycode);
 unsigned char getKeyDown(const int keycode);
 unsigned char getKeyUp(const int keycode);
-
-uVec2 input_mouse_get_position();
 
 unsigned char input_key_setup_api();
 unsigned char input_key_handler_api();
