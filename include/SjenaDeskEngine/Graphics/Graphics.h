@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "SjenaDeskEngine/Input/Input.h"
 #include "SjenaDeskEngine/Math/Vector.h"
 
 #define SJENADESK_WINDOW_LIB 1
