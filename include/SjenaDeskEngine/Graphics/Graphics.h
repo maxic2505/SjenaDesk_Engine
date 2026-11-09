@@ -17,6 +17,20 @@
 
 typedef struct Color { unsigned char r, g, b, a; } Color;
 
+typedef struct Text {
+	Color text_color;
+	Color bg_color;
+}Text;
+
+typedef struct Button {
+	Color color_text;
+	Color color_over;
+	Color color_on_click;
+	Color color_active;
+	Color color_deactive;
+	Color color_border;
+}Button;
+
 typedef enum Extra{
 	IS_REGISTERED =  1<<0,
 	IS_ACTIVE =      1<<1,
@@ -44,20 +58,6 @@ typedef struct Object {
 	unsigned char destroy();
 	#endif
 }Object;
-
-typedef struct Text {
-	Color text_color;
-	Color bg_color;
-}Text;
-
-typedef struct Button {
-	Color color_text;
-	Color color_over;
-	Color color_on_click;
-	Color color_active;
-	Color color_deactive;
-	Color color_border;
-}Button;
 
 typedef unsigned char(*Window_Message)(void* class_ptr, unsigned long long code, unsigned long long data);
 
