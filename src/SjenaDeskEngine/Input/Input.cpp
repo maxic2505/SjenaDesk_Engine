@@ -59,7 +59,7 @@ unsigned char Input::setup(Window* window){
     if(!window || window->hwnd)
     memset(this, 0, sizeof(Input));
     if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
-    if(window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_CYCLE | MSG_BACKGROUND | MSG_FOREGROUND), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0));
+    return window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_CYCLE | MSG_BACKGROUND | MSG_FOREGROUND), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0);
 }
 // Don't use this
 unsigned char Input::reset(){
@@ -71,6 +71,7 @@ unsigned char Input::reset(){
     this->mouse.scroll_x = 0;
     this->mouse.scroll_y = 0;
     this->mouse.events &= (LEFT_BTN_STATE | MIDDLE_BTN_STATE | RIGHT_BTN_STATE);
+    return 0;
 }
 // Don't use this
 unsigned char input_callback(void* class_ptr, unsigned long long code, unsigned long long data){

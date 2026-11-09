@@ -37,11 +37,11 @@ unsigned char Object::create_text(uVec2 position, uVec2 size, const char* text, 
 // Graphic | UI | Create Button Object | 0 = Success
 unsigned char Object::create_button(uVec2 position, uVec2 size, void* data, size_t data_size, Button* properties, Extra extra, unsigned int id){
 	if (!properties) return 1;
-	
-	if(extra & USE_TEXT) data_size = (data) ? strlen((char*)data)+1 : 0;
 
-	if(data && data_size>0){
-		this->data = malloc(data_size);
+	size_t data_s = data ? ((extra & USE_TEXT) ? strlen((char*)data)+1 : data_s) : 0;
+
+	if(data && (extra & USE_TEXT) ? data_s>0 : data_size){
+		this->data = malloc(data_s);
 		if(!this->data)return 1;
 	}
 
@@ -53,9 +53,9 @@ unsigned char Object::create_button(uVec2 position, uVec2 size, void* data, size
 	}
 
 	memcpy(this->properties, properties, sizeof(Button));
-	if(this->data)memcpy(this->data, data, data_size);
+	if(this->data)memcpy(this->data, data, data_s);
 
-	this->data_size = data_size;
+	this->data_size = data_s;
 	this->position = position;
 	this->extra = extra;
 	this->size = size;

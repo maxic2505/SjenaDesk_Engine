@@ -136,81 +136,13 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
 }
 
 unsigned char Input::handler(){
-    this->reset();
+    MSG msg;
     // Keep Windows Thread alive
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-}
-
-HHOOK hook;
-HHOOK mouse_hook;
-MSG msg;
-unsigned char w_event[60];
-Keyboard event;
-
-// TODO: UPDATE TO RAWINPUT
-LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam) {
-    if (nCode == HC_ACTION) {
-        KBDLLHOOKSTRUCT* k = (KBDLLHOOKSTRUCT*)lParam;
-        unsigned char down = (wParam == WM_KEYDOWN || wParam == WM_SYSKEYDOWN) ? 1 : 0;
-        unsigned char up = (wParam == WM_KEYUP || wParam == WM_SYSKEYUP) ? 1 : 0;
-        unsigned long long key = api_key_map(k->scanCode);
-        if ((key != 0) && (down || up)) {
-            if (down) {
-                if (w_event[key] == 0)w_event[key] = 1;
-                else w_event[key] = 2;
-            }
-            else {
-                w_event[key] = 0;
-            }
-            input_key_callback(key, w_event[key]);
-        }
-    }
-    return CallNextHookEx(hook, nCode, wParam, lParam);
-}
-
-// TODO: UPDATE TO RAWINPUT & FIX MOUSE CLICK
-LRESULT CALLBACK LowLevelMouseProc(int nCode, WPARAM wParam, LPARAM lParam){
-    if(nCode == HC_ACTION){
-        unsigned long long key_num = wParam-0x0200;
-
-        // MY EVENTS
-        // NONE = 0
-        //   UP = 1
-        // DOWN = 2
-
-        // CALCULATED EVENTS
-        //  0 = DOWN
-        //  1 = DOWN
-        //  2 = UP
-
-        if(key_num<10 && key_num>0){
-            unsigned char key_state = ((unsigned char)key_num % 3);
-            //unsigned char key   = ((unsigned char)key_num / 3) + MOUSE_LEFT; 
-            //if(key_state == 0)key--;
-
-            //input_key_callback(key, (key_state == 2) ? 0 : 1);
-        }
-    }
-    return CallNextHookEx(mouse_hook, nCode, wParam, lParam);
-}
-
-// Input-API | 0 = Success
-unsigned char input_key_setup_api() {
-    if(!hook)      hook        = SetWindowsHookExW(WH_KEYBOARD_LL, LowLevelKeyboardProc, NULL, 0);
-    if(!mouse_hook)mouse_hook  = SetWindowsHookExW(WH_MOUSE_LL,    LowLevelMouseProc, NULL, 0);
-
-    return (!hook || !mouse_hook) ? 1 : 0;
-}
-
-unsigned char input_key_handler_api() {
-    input_reset();
-
-    
-
-    return 0;
+    return this->reset();
 }
 
 #endif

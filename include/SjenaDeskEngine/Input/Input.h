@@ -65,40 +65,6 @@ typedef enum DeviceHeader{
     U2              = 1<<7,
 }DeviceHeader;
 
-#ifdef _WIN32
-typedef struct HookSlot{
-    HHOOK hook;
-    DeviceHeader header;
-    unsigned int id;
-    #ifdef __cplusplus
-    unsigned char hook(DeviceHeader type);
-    unsigned char unhook();
-    #endif
-}HookSlot;
-
-unsigned char hookslot_hook(HookSlot* slot, DeviceHeader type);
-unsigned char hookslot_unhook(HookSlot* slot);
-
-typedef struct HookManager{
-    HookSlot* slots;
-    unsigned int size;
-    #ifdef __cplusplus
-    unsigned char setup();
-    unsigned char add(HHOOK hook, DeviceHeader type);
-    unsigned char remove_by_id(unsigned int id);
-    unsigned char remove_by_type(DeviceHeader type);
-    unsigned char destroy();
-    #endif
-}HookManager;
-
-unsigned char hookmanager_setup(HookManager* mgr);
-unsigned char hookmanager_add(HookManager* mgr, HHOOK hook, DeviceHeader type);
-unsigned char hookmanager_remove_by_id(HookManager* mgr, unsigned int id);
-unsigned char hookmanager_remove_by_type(HookManager* mgr, DeviceHeader type);
-unsigned char hookmanager_destroy(HookManager* mgr);
-
-#endif
-
 typedef struct Input{
     Keyboard keyboard;
     Mouse mouse;
