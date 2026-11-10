@@ -151,7 +151,7 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
             unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
             unsigned char e0   = ri.data.keyboard.Flags & RI_KEY_E0;
             if(e0 && (ri.data.keyboard.MakeCode == 0x2A || ri.data.keyboard.MakeCode == 0x36))break;
-            this->keyboard.callback(api_key_map(ri.data.keyboard.MakeCode | e0 ? 0x100 : 0), down);
+            this->keyboard.callback(api_key_map(ri.data.keyboard.MakeCode | (e0 ? 0x100 : 0)), down);
             break;
         }
             
