@@ -85,14 +85,14 @@ unsigned char Input::setup(Window* window){
     RAWINPUTDEVICE rid[2] = {0};
     rid[0].usUsagePage = 0x01;
     rid[0].usUsage = 0x02;
-    rid[0].dwFlags = 0;
+    rid[0].dwFlags = RIDEV_INPUTSINK;
     rid[0].hwndTarget = window->hwnd;
 
     rid[1].usUsagePage = 0x01;
     rid[1].usUsage = 0x06;
-    rid[1].dwFlags = 0;
+    rid[1].dwFlags = RIDEV_INPUTSINK;
     rid[1].hwndTarget = window->hwnd;
-    return RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE));
+    return !RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE));
 }
 
 unsigned char Input::callback(unsigned long long code, unsigned long long data){
