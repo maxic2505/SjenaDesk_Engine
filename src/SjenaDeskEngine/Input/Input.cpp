@@ -18,8 +18,9 @@ unsigned char Keyboard::remove_state(const KeyCode code){
 }
 
 unsigned char Keyboard::callback(KeyCode code, int value){
+    printf("Keyboard.callback(): Recived\n");
     if(code == 0ULL)return 0XFF;
-
+    printf("Keyboard.callback(): Code Available\n");
     unsigned char down = value > 0;
     unsigned char was_down = this->get_key(code);
 

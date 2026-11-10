@@ -96,6 +96,7 @@ unsigned char Input::setup(Window* window){
 }
 
 unsigned char Input::callback(unsigned long long code, unsigned long long data){
+    printf("Input.callback(): Recived msg\n");
     // Get RAWINPUT Struct
     RAWINPUT ri;
     UINT ri_size = sizeof(ri);
@@ -106,6 +107,7 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
     switch (ri.header.dwType)
     {
         case RIM_TYPEMOUSE: {
+            printf("Input.callback(): Mouse msg\n");
             // Mouse Buttons
             const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
             if(usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) this->mouse.events |= LEFT_BTN_STATE | LEFT_BTN_PRESSED;
@@ -141,7 +143,11 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
         }
             
         case RIM_TYPEKEYBOARD: {
-            if(ri.data.keyboard.Flags & RI_KEY_E1)break;
+            printf("Input.callback(): Keyboard msg\n");
+            if(ri.data.keyboard.Flags & RI_KEY_E1){
+                printf("Input.callback(): Operation break REASON: KEY_E1\n");
+                break;
+            }
             unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
             unsigned char e0   = ri.data.keyboard.Flags & RI_KEY_E0;
             if(e0 && (ri.data.keyboard.MakeCode == 0x2A || ri.data.keyboard.MakeCode == 0x36))break;
@@ -155,13 +161,14 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
 }
 
 unsigned char Input::handler(){
+    this->reset();
     MSG msg;
     // Keep Windows Thread alive
     while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    return this->reset();
+    return 0;
 }
 
 #endif
