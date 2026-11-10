@@ -68,6 +68,7 @@ HWND_MGR mgr = {0};
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	HWND_SLOT* ptr = mgr.get_slot_by_hwnd(hwnd);
 	if(ptr){
+		printf("SLOT FOUND");
 		switch (uMsg){
 		//CYCLE
 		case WM_CREATE: break;
@@ -89,11 +90,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		// RAWINPUT
 		case WM_INPUT: 
 			ptr->msg_ptr(ptr->msg_class_ptr, wParam, (unsigned long long)lParam);
+			printf("MSG SEND");
 		break;
 		case WM_INPUT_DEVICE_CHANGE: break;
 		default:break;
 		}
-	}
+	}else printf("ERROR: Couldnt find Slot");
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 

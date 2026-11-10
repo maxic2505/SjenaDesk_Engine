@@ -100,7 +100,7 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
     RAWINPUT ri;
     UINT ri_size = sizeof(ri);
     if(GetRawInputData((HRAWINPUT)data, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) == (UINT)-1){
-        //Fehler behandlung
+        printf("ERROR: GETRAWINPUT");
         return 1;
     }
     switch (ri.header.dwType)

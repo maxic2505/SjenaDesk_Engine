@@ -3,6 +3,7 @@
 #include "SjenaDeskEngine/Graphics/Graphics.h"
 #include "SjenaDeskEngine/Input/KeyLayout.h"
 #include "SjenaDeskEngine/Math/Vector.h"
+#include <stdio.h>
 
 #define SJENADESK_INPUT_LIB 1
 
@@ -10,7 +11,6 @@
 #include <linux/input.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <stdio.h>
 #endif
 
 #ifdef _WIN32
