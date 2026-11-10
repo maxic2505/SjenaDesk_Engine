@@ -52,9 +52,14 @@ typedef struct Mouse{
     short scroll_x;
     short scroll_y;
     unsigned char events;
+    #ifdef __cplusplus
+    unsigned char get_event(MouseEvent event);
+    #endif
 }Mouse;
 
-typedef enum DeviceHeader{
+unsigned char mouse_get_event(Mouse* mouse, MouseEvent event);
+
+typedef enum DeviceHeader : unsigned char{
     MOUSE_STATUS    = 1<<0,
     MOUSE_BG        = 1<<1,
     MOUSE_IN_FG     = 1<<2,
@@ -73,7 +78,7 @@ typedef struct Input{
     HWND hWnd;
     #endif
 
-    DeviceHeader header;
+    unsigned char header;
 
     #ifdef __cplusplus
     unsigned char setup(Window* window);

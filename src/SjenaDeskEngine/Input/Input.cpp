@@ -1,5 +1,7 @@
 #include "SjenaDeskEngine/Input/Input.h"
 
+#define POINTER_ERR 0XFF
+
 //DEVICE
 unsigned char Keyboard::get_key         (const KeyCode code){return (is_pressed_keys  & code) ? 1 : 0;}
 unsigned char Keyboard::get_key_down    (const KeyCode code){return (pressed_states   & code) ? 1 : 0;}
@@ -18,9 +20,7 @@ unsigned char Keyboard::remove_state(const KeyCode code){
 }
 
 unsigned char Keyboard::callback(KeyCode code, int value){
-    printf("Keyboard.callback(): Recived\n");
     if(code == 0ULL)return 0XFF;
-    printf("Keyboard.callback(): Code Available\n");
     unsigned char down = value > 0;
     unsigned char was_down = this->get_key(code);
 
@@ -30,13 +30,11 @@ unsigned char Keyboard::callback(KeyCode code, int value){
 }
 
 unsigned char keyboard_get_key(Keyboard* keyboard, const KeyCode code){
-    return (keyboard) ? keyboard->get_key(code) : 0;
+    return (keyboard) ? keyboard->get_key(code) : POINTER_ERR;
 }
 unsigned char keyboard_get_key_down(Keyboard* keyboard, const KeyCode code){
-    return (keyboard) ? keyboard->get_key_down(code) : 0;
+    return (keyboard) ? keyboard->get_key_down(code) : POINTER_ERR;
 }
-
-#define POINTER_ERR 0XFF
     
 unsigned char keyboard_set_key(Keyboard* keyboard, const KeyCode code, const unsigned char state){
     return (keyboard) ? keyboard->set_key(code, state) : POINTER_ERR;
@@ -56,6 +54,22 @@ unsigned char is_modifier(KeyCode code){
     return (code & MODIFIER_KEYS) ? 1 : 0;
 }
 
+
+
+
+
+unsigned char Mouse::get_event(MouseEvent event){
+    return (this->events & event) ? 1 : 0;
+}
+
+unsigned char mouse_get_event(Mouse* mouse, MouseEvent event){
+    return (mouse) ? mouse->get_event(event) : POINTER_ERR;
+}
+
+
+
+
+
 // Don't use this
 unsigned char Input::reset(){
     // Keyboard
@@ -66,6 +80,9 @@ unsigned char Input::reset(){
     this->mouse.scroll_x = 0;
     this->mouse.scroll_y = 0;
     this->mouse.events &= (LEFT_BTN_STATE | MIDDLE_BTN_STATE | RIGHT_BTN_STATE);
+
+    // Input
+    this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG);
     return 0;
 }
 // Don't use this

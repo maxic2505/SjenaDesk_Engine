@@ -96,18 +96,14 @@ unsigned char Input::setup(Window* window){
 }
 
 unsigned char Input::callback(unsigned long long code, unsigned long long data){
-    printf("Input.callback(): Recived msg\n");
     // Get RAWINPUT Struct
     RAWINPUT ri;
     UINT ri_size = sizeof(ri);
-    if(GetRawInputData((HRAWINPUT)data, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) == (UINT)-1){
-        printf("ERROR: GETRAWINPUT");
-        return 1;
-    }
+    if(GetRawInputData((HRAWINPUT)data, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) == (UINT)-1)return 3;
     switch (ri.header.dwType)
     {
         case RIM_TYPEMOUSE: {
-            printf("Input.callback(): Mouse msg\n");
+            if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= MOUSE_IN_FG;
             // Mouse Buttons
             const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
             if(usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) this->mouse.events |= LEFT_BTN_STATE | LEFT_BTN_PRESSED;
@@ -143,11 +139,8 @@ unsigned char Input::callback(unsigned long long code, unsigned long long data){
         }
             
         case RIM_TYPEKEYBOARD: {
-            printf("Input.callback(): Keyboard msg\n");
-            if(ri.data.keyboard.Flags & RI_KEY_E1){
-                printf("Input.callback(): Operation break REASON: KEY_E1\n");
-                break;
-            }
+            if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= KEYBOARD_IN_FG;
+            if(ri.data.keyboard.Flags & RI_KEY_E1)break;
             unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
             unsigned char e0   = ri.data.keyboard.Flags & RI_KEY_E0;
             if(e0 && (ri.data.keyboard.MakeCode == 0x2A || ri.data.keyboard.MakeCode == 0x36))break;
