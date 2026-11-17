@@ -87,7 +87,7 @@ unsigned char Input::reset(){
 }
 // Don't use this
 unsigned char input_callback(void* class_ptr, WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
-    return ((Input*)class_ptr)->callback(code, data);
+    return ((Input*)class_ptr)->callback(msg, code, data);
 }
 unsigned char input_handler(Input* input){
     return (input) ? input->handler() : POINTER_ERR;
