@@ -81,6 +81,7 @@ typedef unsigned char(*Window_Message)(void* class_ptr, WINDOW_MSG_CODE msg, uns
 
 #define MSG_WINDOW (MSG_WINDOW_MOVE | MSG_WINDOW_SIZE | MSG_WINDOW_PAINT | MSG_WINDOW_ACTIVATE | MSG_WINDOW_SETFOCUS | MSG_WINDOW_KILLFOCUS)
 #define MSG_CYCLE (MSG_CYCLE_CREATE | MSG_CYCLE_CLOSE | MSG_CYCLE_DESTROY)
+#define MSG_FOCUS (MSG_WINDOW_KILLFOCUS | MSG_WINDOW_SETFOCUS | MSG_WINDOW_ACTIVATE)
 typedef struct Window {
 	char* class_name;
 	Object* objects;

@@ -71,13 +71,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		switch (uMsg){
 		//CYCLE
 		case WM_CREATE:
-			if(ptr->flags & MSG_CYCLE_CREATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CREATE, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_CYCLE_CREATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CREATE, 0, 0);
 		break;
 		case WM_CLOSE:
-			if(ptr->flags & MSG_CYCLE_CLOSE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CLOSE, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_CYCLE_CLOSE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CLOSE, 0, 0);
 		break;
 		case WM_DESTROY:
-			if(ptr->flags & MSG_CYCLE_DESTROY) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_DESTROY, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_CYCLE_DESTROY) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_DESTROY, 0, 0);
 		break;
 
 		//WINDOW
@@ -88,13 +88,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 			if(ptr->flags & MSG_WINDOW_MOVE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_MOVE, wParam, (unsigned long long)lParam);
 		break;
 		case WM_SETFOCUS:
-			if(ptr->flags & MSG_WINDOW_SETFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_SETFOCUS, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_SETFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_SETFOCUS, 0, 0);
 		break;
 		case WM_KILLFOCUS:
-			if(ptr->flags & MSG_WINDOW_KILLFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_KILLFOCUS, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_KILLFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_KILLFOCUS, 0, 0);
 		break;
 		case WM_ACTIVATE:
-			if(ptr->flags & MSG_WINDOW_ACTIVATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_ACTIVATE, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_ACTIVATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_ACTIVATE, 0, 0);
 		break;
 		case WM_PAINT:
 			if(ptr->flags & MSG_WINDOW_PAINT) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_PAINT, wParam, (unsigned long long)lParam);

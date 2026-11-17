@@ -83,7 +83,7 @@ unsigned char Input::setup(Window* window, unsigned char settings){
     }else{
         memset(this, 0, sizeof(Input));
         if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
-        if(window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_CYCLE | MSG_BACKGROUND | MSG_FOREGROUND), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0))return 1;
+        if(window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_FOCUS), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0))return 1;
     }
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-architecture#hid-clients-supported-in-windows
     // 0x01 / 0x02 MOUSE
@@ -102,6 +102,7 @@ unsigned char Input::setup(Window* window, unsigned char settings){
 }
 
 unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
+    // TODO: Optimize and try to check if windows lost focus without global input & if global input blocked because app with admin is in Foreground
     if(msg & MSG_INPUT){
         // Get RAWINPUT Struct
         RAWINPUT ri;
