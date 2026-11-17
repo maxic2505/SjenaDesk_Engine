@@ -59,8 +59,6 @@ typedef struct Object {
 	#endif
 }Object;
 
-typedef unsigned char(*Window_Message)(void* class_ptr, unsigned long long code, unsigned long long data);
-
 typedef enum WINDOW_MSG_CODE : unsigned long long{
 	MSG_INPUT			 = 1ULL<<0,
 	MSG_CYCLE_CREATE	 = 1ULL<<1,
@@ -78,6 +76,8 @@ typedef enum WINDOW_MSG_CODE : unsigned long long{
 	MSG_FOREGROUND		 = 1ULL<<13, 
 	MSG_BACKGROUND		 = 1ULL<<14,
 }WINDOW_MSG_CODE;
+
+typedef unsigned char(*Window_Message)(void* class_ptr, WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
 
 #define MSG_WINDOW (MSG_WINDOW_MOVE | MSG_WINDOW_SIZE | MSG_WINDOW_PAINT | MSG_WINDOW_ACTIVATE | MSG_WINDOW_SETFOCUS | MSG_WINDOW_KILLFOCUS)
 #define MSG_CYCLE (MSG_CYCLE_CREATE | MSG_CYCLE_CLOSE | MSG_CYCLE_DESTROY)

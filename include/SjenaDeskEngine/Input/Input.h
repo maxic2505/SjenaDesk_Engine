@@ -81,15 +81,15 @@ typedef struct Input{
     unsigned char header;
 
     #ifdef __cplusplus
-    unsigned char setup(Window* window);
+    unsigned char setup(Window* window, unsigned char settings);
     unsigned char destroy();
-    unsigned char callback(unsigned long long code, unsigned long long data);
+    unsigned char callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
     unsigned char handler();
     unsigned char reset();
     #endif
 }Input;
 
-unsigned char input_callback(void* class_ptr, unsigned long long code, unsigned long long data);
+unsigned char input_callback(void* class_ptr, WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
 unsigned char input_handler(Input* input);
 unsigned char input_reset(Input* input);
 

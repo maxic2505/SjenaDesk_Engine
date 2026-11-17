@@ -76,80 +76,89 @@ KeyCode api_key_map(int code) {
     }
 }
 
-unsigned char Input::setup(Window* window){
-    if(!window || window->hwnd)
-    memset(this, 0, sizeof(Input));
-    if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
-    if(window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_CYCLE | MSG_BACKGROUND | MSG_FOREGROUND), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0))return 1;
+unsigned char Input::setup(Window* window, unsigned char settings){
+    if(!window) return 0xff;
+    if(window->hwnd){
 
+    }else{
+        memset(this, 0, sizeof(Input));
+        if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
+        if(window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_CYCLE | MSG_BACKGROUND | MSG_FOREGROUND), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0))return 1;
+    }
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-architecture#hid-clients-supported-in-windows
+    // 0x01 / 0x02 MOUSE
     RAWINPUTDEVICE rid[2] = {0};
     rid[0].usUsagePage = 0x01;
     rid[0].usUsage = 0x02;
-    rid[0].dwFlags = RIDEV_INPUTSINK;
+    rid[0].dwFlags = (settings & MOUSE_BG) ? RIDEV_INPUTSINK : 0;
     rid[0].hwndTarget = window->hwnd;
 
+    // 0x01 / 0x06 KEYBOARD
     rid[1].usUsagePage = 0x01;
     rid[1].usUsage = 0x06;
-    rid[1].dwFlags = RIDEV_INPUTSINK;
+    rid[1].dwFlags = (settings & KEYBOARD_BG) ? RIDEV_INPUTSINK : 0;
     rid[1].hwndTarget = window->hwnd;
     return !RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE));
 }
 
-unsigned char Input::callback(unsigned long long code, unsigned long long data){
-    // Get RAWINPUT Struct
-    RAWINPUT ri;
-    UINT ri_size = sizeof(ri);
-    if(GetRawInputData((HRAWINPUT)data, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) == (UINT)-1)return 3;
-    switch (ri.header.dwType)
-    {
-        case RIM_TYPEMOUSE: {
-            if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= MOUSE_IN_FG;
-            // Mouse Buttons
-            const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
-            if(usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) this->mouse.events |= LEFT_BTN_STATE | LEFT_BTN_PRESSED;
-            if(usButtonFlags & RI_MOUSE_BUTTON_1_UP) this->mouse.events = this->mouse.events & ~LEFT_BTN_STATE;
+unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
+    if(msg & MSG_INPUT){
+        // Get RAWINPUT Struct
+        RAWINPUT ri;
+        UINT ri_size = sizeof(ri);
+        if(GetRawInputData((HRAWINPUT)data, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) == (UINT)-1)return 3;
+        switch (ri.header.dwType)
+        {
+            case RIM_TYPEMOUSE: {
+                if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= MOUSE_IN_FG;
+                // Mouse Buttons
+                const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
+                if(usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) this->mouse.events |= LEFT_BTN_STATE | LEFT_BTN_PRESSED;
+                if(usButtonFlags & RI_MOUSE_BUTTON_1_UP) this->mouse.events = this->mouse.events & ~LEFT_BTN_STATE;
 
-            if(usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) this->mouse.events |= RIGHT_BTN_STATE | RIGHT_BTN_PRESSED;
-            if(usButtonFlags & RI_MOUSE_BUTTON_2_UP) this->mouse.events = this->mouse.events & ~RIGHT_BTN_STATE;
+                if(usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) this->mouse.events |= RIGHT_BTN_STATE | RIGHT_BTN_PRESSED;
+                    if(usButtonFlags & RI_MOUSE_BUTTON_2_UP) this->mouse.events = this->mouse.events & ~RIGHT_BTN_STATE;
 
-            if(usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) this->mouse.events |= MIDDLE_BTN_STATE | MIDDLE_BTN_PRESSED;
-            if(usButtonFlags & RI_MOUSE_BUTTON_3_UP) this->mouse.events = this->mouse.events & ~MIDDLE_BTN_STATE;
+                if(usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) this->mouse.events |= MIDDLE_BTN_STATE | MIDDLE_BTN_PRESSED;
+                if(usButtonFlags & RI_MOUSE_BUTTON_3_UP) this->mouse.events = this->mouse.events & ~MIDDLE_BTN_STATE;
 
-            // Mouse Position & Acceleration
-            if(!(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)){
-                if(ri.data.mouse.lLastX || ri.data.mouse.lLastY)this->mouse.events |= SENSOR_EVENT;
-                // Reset at Input.reset() necesary
-                this->mouse.acceleration.x += ri.data.mouse.lLastX;
-                this->mouse.acceleration.y += ri.data.mouse.lLastY;
-                POINT point;
-                if(GetCursorPos(&point))
-                { this->mouse.position = iVec2{point.x, point.y}; }
+                // Mouse Position & Acceleration
+                if(!(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)){
+                    if(ri.data.mouse.lLastX || ri.data.mouse.lLastY)this->mouse.events |= SENSOR_EVENT;
+                    // Reset at Input.reset() necesary
+                    this->mouse.acceleration.x += ri.data.mouse.lLastX;
+                    this->mouse.acceleration.y += ri.data.mouse.lLastY;
+                    POINT point;
+                    if(GetCursorPos(&point))
+                    { this->mouse.position = iVec2{point.x, point.y}; }
+                }
+            
+                // usButtonData
+                if(ri.data.mouse.usButtonFlags & RI_MOUSE_HWHEEL){
+                    this->mouse.scroll_x += (short)ri.data.mouse.usButtonData;
+                    this->mouse.events |= SCROLL_EVENT;
+                }
+                if(ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL){
+                    this->mouse.scroll_y += (short)ri.data.mouse.usButtonData;
+                    this->mouse.events |= SCROLL_EVENT;
+                }
+                break;
             }
             
-            // usButtonData
-            if(ri.data.mouse.usButtonFlags & RI_MOUSE_HWHEEL){
-                this->mouse.scroll_x += (short)ri.data.mouse.usButtonData;
-                this->mouse.events |= SCROLL_EVENT;
+            case RIM_TYPEKEYBOARD: {
+                if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= KEYBOARD_IN_FG;
+                if(ri.data.keyboard.Flags & RI_KEY_E1)break;
+                unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
+                unsigned char e0   = ri.data.keyboard.Flags & RI_KEY_E0;
+                if(e0 && (ri.data.keyboard.MakeCode == 0x2A || ri.data.keyboard.MakeCode == 0x36))break;
+                this->keyboard.callback(api_key_map(ri.data.keyboard.MakeCode | (e0 ? 0x100 : 0)), down);
+                break;
             }
-            if(ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL){
-                this->mouse.scroll_y += (short)ri.data.mouse.usButtonData;
-                this->mouse.events |= SCROLL_EVENT;
-            }
-            break;
+        
+            default: break;
         }
-            
-        case RIM_TYPEKEYBOARD: {
-            if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= KEYBOARD_IN_FG;
-            if(ri.data.keyboard.Flags & RI_KEY_E1)break;
-            unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
-            unsigned char e0   = ri.data.keyboard.Flags & RI_KEY_E0;
-            if(e0 && (ri.data.keyboard.MakeCode == 0x2A || ri.data.keyboard.MakeCode == 0x36))break;
-            this->keyboard.callback(api_key_map(ri.data.keyboard.MakeCode | (e0 ? 0x100 : 0)), down);
-            break;
-        }
-            
-        default: break;
     }
+    
     return 0;
 }
 

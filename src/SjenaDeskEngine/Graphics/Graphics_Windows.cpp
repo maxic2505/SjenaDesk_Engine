@@ -70,25 +70,50 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 	if(ptr){
 		switch (uMsg){
 		//CYCLE
-		case WM_CREATE: break;
-		case WM_CLOSE: break;
-		case WM_DESTROY: break;
+		case WM_CREATE:
+			if(ptr->flags & MSG_CYCLE_CREATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CREATE, wParam, (unsigned long long)lParam);
+		break;
+		case WM_CLOSE:
+			if(ptr->flags & MSG_CYCLE_CLOSE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CLOSE, wParam, (unsigned long long)lParam);
+		break;
+		case WM_DESTROY:
+			if(ptr->flags & MSG_CYCLE_DESTROY) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_DESTROY, wParam, (unsigned long long)lParam);
+		break;
+
 		//WINDOW
-		case WM_SIZE: break;
-		case WM_MOVE: break;
-		case WM_SETFOCUS: break;
-		case WM_KILLFOCUS: break;
-		case WM_ACTIVATE: break;
-		case WM_PAINT: break;
-		case WM_ENTERSIZEMOVE: break;
-		case WM_EXITSIZEMOVE: break;
+		case WM_SIZE:
+			if(ptr->flags & MSG_WINDOW_SIZE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_SIZE, wParam, (unsigned long long)lParam);
+		break;
+		case WM_MOVE:
+			if(ptr->flags & MSG_WINDOW_MOVE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_MOVE, wParam, (unsigned long long)lParam);
+		break;
+		case WM_SETFOCUS:
+			if(ptr->flags & MSG_WINDOW_SETFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_SETFOCUS, wParam, (unsigned long long)lParam);
+		break;
+		case WM_KILLFOCUS:
+			if(ptr->flags & MSG_WINDOW_KILLFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_KILLFOCUS, wParam, (unsigned long long)lParam);
+		break;
+		case WM_ACTIVATE:
+			if(ptr->flags & MSG_WINDOW_ACTIVATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_ACTIVATE, wParam, (unsigned long long)lParam);
+		break;
+		case WM_PAINT:
+			if(ptr->flags & MSG_WINDOW_PAINT) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_PAINT, wParam, (unsigned long long)lParam);
+		break;
+		case WM_ENTERSIZEMOVE:
+			if(ptr->flags & MSG_WINDOW_ENTERRESIZE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_ENTERRESIZE, wParam, (unsigned long long)lParam);
+		break;
+		case WM_EXITSIZEMOVE:
+			if(ptr->flags & MSG_WINDOW_EXITRESIZE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_EXITRESIZE, wParam, (unsigned long long)lParam);
+		break;
 		
 		// For Text usefull
-		case WM_CHAR: break;
+		case WM_CHAR:
+			if(ptr->flags & MSG_CHAR) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CHAR, wParam, (unsigned long long)lParam);
+		break;
 		
 		// RAWINPUT
-		case WM_INPUT: 
-			ptr->msg_ptr(ptr->msg_class_ptr, wParam, (unsigned long long)lParam);
+		case WM_INPUT:
+			if(ptr->flags & MSG_INPUT)ptr->msg_ptr(ptr->msg_class_ptr, MSG_INPUT, wParam, (unsigned long long)lParam);
 		break;
 		case WM_INPUT_DEVICE_CHANGE: break;
 		default:break;
