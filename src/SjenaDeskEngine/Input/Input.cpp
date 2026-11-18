@@ -62,8 +62,21 @@ unsigned char Mouse::get_event(MouseEvent event){
     return (this->events & event) ? 1 : 0;
 }
 
+unsigned char Mouse::reset(unsigned char except_e){
+    // Mouse
+    this->acceleration = iVec2{0, 0};
+    this->scroll_x = 0;
+    this->scroll_y = 0;
+    this->events &= except_e;
+    return 0;
+}
+
 unsigned char mouse_get_event(Mouse* mouse, MouseEvent event){
     return (mouse) ? mouse->get_event(event) : POINTER_ERR;
+}
+
+unsigned char mouse_reset(Mouse* mouse, unsigned char except_e){
+    return (mouse) ? mouse->reset(except_e) : POINTER_ERR;
 }
 
 
@@ -85,6 +98,21 @@ unsigned char Input::reset(){
     this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG);
     return 0;
 }
+unsigned char Input:: full_reset(){
+    // Keyboard
+    this->keyboard.pressed_states = 0ULL;
+    this->keyboard.is_pressed_keys = 0ULL;
+
+    // Mouse
+    this->mouse.acceleration = iVec2{0, 0};
+    this->mouse.scroll_x = 0;
+    this->mouse.scroll_y = 0;
+    this->mouse.events = 0;
+
+    // Input
+    this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG | FOCUS_DEAD);
+    return 0;
+}
 // Don't use this
 unsigned char input_callback(void* class_ptr, WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
     return ((Input*)class_ptr)->callback(msg, code, data);
@@ -95,4 +123,7 @@ unsigned char input_handler(Input* input){
 // Don't use this
 unsigned char input_reset(Input* input){
     return (input) ? input->reset() : POINTER_ERR;
+}
+unsigned char input_full_reset(Input* input){
+    return (input) ? input->full_reset() : POINTER_ERR;
 }

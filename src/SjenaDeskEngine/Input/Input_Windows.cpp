@@ -78,9 +78,7 @@ KeyCode api_key_map(int code) {
 
 unsigned char Input::setup(Window* window, unsigned char settings){
     if(!window) return 0xff;
-    if(window->hwnd){
-
-    }else{
+    if(!window->hwnd){
         memset(this, 0, sizeof(Input));
         if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
         if(window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_FOCUS), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0))return 1;
@@ -98,16 +96,31 @@ unsigned char Input::setup(Window* window, unsigned char settings){
     rid[1].usUsage = 0x06;
     rid[1].dwFlags = (settings & KEYBOARD_BG) ? RIDEV_INPUTSINK : 0;
     rid[1].hwndTarget = window->hwnd;
-    return !RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE));
+
+    // Register & refresh header
+    unsigned char status = RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE));
+    if(status){
+        if(settings & MOUSE_BG)this->header |= MOUSE_BG;
+        else this->header &= ~MOUSE_BG;
+        if(settings & KEYBOARD_BG)this->header |= KEYBOARD_BG;
+        else this->header &= ~KEYBOARD_BG;
+        this->full_reset();
+    }
+    // Since RegisterRawInputDevices() returns 1 if success
+    return !status;
 }
 
 unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
     // TODO: Optimize and try to check if windows lost focus without global input & if global input blocked because app with admin is in Foreground
-    if(msg & MSG_WINDOW_KILLFOCUS){
+    if((msg & MSG_WINDOW_KILLFOCUS)){
         this->header |= FOCUS_DEAD;
-        this->reset();
-        this->keyboard.is_pressed_keys = 0ULL;
-        this->mouse.events = 0;
+        if(this->header & MOUSE_BG) this->mouse.reset(0);
+        if(this->header & KEYBOARD_BG){
+            // Keyboard
+            this->keyboard.pressed_states = 0ULL;
+            this->keyboard.is_pressed_keys = 0ULL;
+        }
+        this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG | FOCUS_DEAD);
         return 0;
     }
     if(msg & MSG_WINDOW_SETFOCUS){

@@ -54,10 +54,12 @@ typedef struct Mouse{
     unsigned char events;
     #ifdef __cplusplus
     unsigned char get_event(MouseEvent event);
+    unsigned char reset(unsigned char except_e);
     #endif
 }Mouse;
 
 unsigned char mouse_get_event(Mouse* mouse, MouseEvent event);
+unsigned char mouse_reset(Mouse* mouse, unsigned char except_e);
 
 typedef enum DeviceHeader : unsigned char{
     MOUSE_STATUS    = 1<<0,
@@ -86,12 +88,14 @@ typedef struct Input{
     unsigned char callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
     unsigned char handler();
     unsigned char reset();
+    unsigned char full_reset();
     #endif
 }Input;
 
 unsigned char input_callback(void* class_ptr, WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
 unsigned char input_handler(Input* input);
 unsigned char input_reset(Input* input);
+unsigned char input_full_reset(Input* input);
 
 #ifdef __cplusplus
 }
