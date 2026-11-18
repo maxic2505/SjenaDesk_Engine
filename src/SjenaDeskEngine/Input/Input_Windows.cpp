@@ -103,7 +103,18 @@ unsigned char Input::setup(Window* window, unsigned char settings){
 
 unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
     // TODO: Optimize and try to check if windows lost focus without global input & if global input blocked because app with admin is in Foreground
+    if(msg & MSG_WINDOW_KILLFOCUS){
+        this->header |= FOCUS_DEAD;
+        this->reset();
+        this->keyboard.is_pressed_keys = 0ULL;
+        this->mouse.events = 0;
+        return 0;
+    }else if(msg & MSG_WINDOW_SETFOCUS){
+        this->header &= ~FOCUS_DEAD;
+        return 0;
+    }
     if(msg & MSG_INPUT){
+        if(this->header & FOCUS_DEAD)return 0;
         // Get RAWINPUT Struct
         RAWINPUT ri;
         UINT ri_size = sizeof(ri);

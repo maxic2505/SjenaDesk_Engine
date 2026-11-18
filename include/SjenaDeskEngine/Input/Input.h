@@ -66,7 +66,7 @@ typedef enum DeviceHeader : unsigned char{
     KEYBOARD_STATUS = 1<<3,
     KEYBOARD_BG     = 1<<4,
     KEYBOARD_IN_FG  = 1<<5,
-    U1              = 1<<6,
+    FOCUS_DEAD      = 1<<6,
     U2              = 1<<7,
 }DeviceHeader;
 
