@@ -112,20 +112,6 @@ unsigned char Input::setup(Window* window, unsigned char settings){
 
 unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
     // TODO: Optimize and try to check if windows lost focus without global input & if global input blocked because app with admin is in Foreground
-    if((msg & MSG_WINDOW_KILLFOCUS)){
-        this->header |= FOCUS_DEAD;
-        if(!(this->header & MOUSE_BG)) this->mouse.reset(0);
-        if(!(this->header & KEYBOARD_BG)){
-            // Keyboard
-            this->keyboard.pressed_states = 0ULL;
-            this->keyboard.is_pressed_keys = 0ULL;
-        }
-        this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG | FOCUS_DEAD);
-        return 0;
-    }else if(msg & MSG_WINDOW_SETFOCUS){
-        this->header &= ~FOCUS_DEAD;
-        return 0;
-    }
     if(msg & MSG_INPUT){
         // Get RAWINPUT Struct
         RAWINPUT ri;
@@ -183,8 +169,25 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         
             default: break;
         }
+        return 0;
+    }
+
+    if((msg & MSG_WINDOW_KILLFOCUS)){
+        this->header |= FOCUS_DEAD;
+        if(!(this->header & MOUSE_BG)) this->mouse.reset(0);
+        if(!(this->header & KEYBOARD_BG)){
+            // Keyboard
+            this->keyboard.pressed_states = 0ULL;
+            this->keyboard.is_pressed_keys = 0ULL;
+        }
+        this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG | FOCUS_DEAD);
+        return 0;
     }
     
+    if(msg & MSG_WINDOW_SETFOCUS){
+        this->header &= ~FOCUS_DEAD;
+        return 0;
+    }
     return 0;
 }
 
