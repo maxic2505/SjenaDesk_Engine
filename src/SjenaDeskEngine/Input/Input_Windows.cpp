@@ -122,8 +122,7 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         }
         this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG | FOCUS_DEAD);
         return 0;
-    }
-    if(msg & MSG_WINDOW_SETFOCUS){
+    }else if(msg & MSG_WINDOW_SETFOCUS){
         this->header &= ~FOCUS_DEAD;
         return 0;
     }
