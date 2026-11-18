@@ -109,7 +109,8 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         this->keyboard.is_pressed_keys = 0ULL;
         this->mouse.events = 0;
         return 0;
-    }else if(msg & MSG_WINDOW_SETFOCUS){
+    }
+    if(msg & MSG_WINDOW_SETFOCUS){
         this->header &= ~FOCUS_DEAD;
         return 0;
     }
