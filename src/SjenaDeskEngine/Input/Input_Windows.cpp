@@ -114,8 +114,8 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
     // TODO: Optimize and try to check if windows lost focus without global input & if global input blocked because app with admin is in Foreground
     if((msg & MSG_WINDOW_KILLFOCUS)){
         this->header |= FOCUS_DEAD;
-        if(this->header & MOUSE_BG) this->mouse.reset(0);
-        if(this->header & KEYBOARD_BG){
+        if(!(this->header & MOUSE_BG)) this->mouse.reset(0);
+        if(!(this->header & KEYBOARD_BG)){
             // Keyboard
             this->keyboard.pressed_states = 0ULL;
             this->keyboard.is_pressed_keys = 0ULL;
@@ -128,7 +128,6 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         return 0;
     }
     if(msg & MSG_INPUT){
-        if(this->header & FOCUS_DEAD)return 0;
         // Get RAWINPUT Struct
         RAWINPUT ri;
         UINT ri_size = sizeof(ri);
@@ -136,6 +135,7 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         switch (ri.header.dwType)
         {
             case RIM_TYPEMOUSE: {
+                if(!(this->header & MOUSE_BG) && (this->header & FOCUS_DEAD))return 0;
                 if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= MOUSE_IN_FG;
                 // Mouse Buttons
                 const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
@@ -172,6 +172,7 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
             }
             
             case RIM_TYPEKEYBOARD: {
+                if(!(this->header & KEYBOARD_BG) && (this->header & FOCUS_DEAD))return 0;
                 if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= KEYBOARD_IN_FG;
                 if(ri.data.keyboard.Flags & RI_KEY_E1)break;
                 unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
