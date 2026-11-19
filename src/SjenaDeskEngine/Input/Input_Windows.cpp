@@ -128,7 +128,7 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         this->header &= ~FOCUS_DEAD;
         return 0;
     }
-    
+
     if(msg & MSG_INPUT){
         // Get RAWINPUT Struct
         RAWINPUT ri;
@@ -195,7 +195,7 @@ unsigned char Input::handler(){
     this->reset();
     MSG msg;
     // Keep Windows Thread alive
-    while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
+    while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
