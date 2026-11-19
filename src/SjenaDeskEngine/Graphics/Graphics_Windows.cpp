@@ -76,8 +76,12 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		case WM_CLOSE:
 			if(ptr->flags & MSG_CYCLE_CLOSE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CLOSE, 0, 0);
 		break;
+		case WM_NCDESTROY:
+			mgr.remove(hwnd);
+			break;
 		case WM_DESTROY:
 			if(ptr->flags & MSG_CYCLE_DESTROY) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_DESTROY, 0, 0);
+			PostQuitMessage(0);
 		break;
 
 		//WINDOW
@@ -187,12 +191,15 @@ unsigned char Window::set_pos(uVec2 pos){
 
 // Graphic | Destroy a Window | 0 = Success
 unsigned char Window::destroy(){
-	if (this->hwnd && DestroyWindow(this->hwnd)) {
-		if(this->class_name)free(this->class_name);
-		mgr.remove(hwnd);
-		memset(this, 0, sizeof(Window));
-		return 0;
-	}else return 1;
+	if(this->hwnd && IsWindow(this->hwnd))DestroyWindow(this->hwnd);
+	mgr.remove(this->hwnd);
+	if(this->class_name){
+		UnregisterClassA(this->class_name, GetModuleHandle(nullptr));
+		free(this->class_name);
+		this->class_name = nullptr;
+	}
+	memset(this, 0, sizeof(Window));
+	return 0;
 }
 
 unsigned char graphic_render_text(Object* object, HDC* hdc, HBRUSH* brush) {

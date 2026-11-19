@@ -198,6 +198,7 @@ unsigned char Input::handler(){
     while (GetMessage(&msg, nullptr, 0, 0)>0) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+        if(msg.message == WM_QUIT)return 1;
     }
     return 0;
 }
