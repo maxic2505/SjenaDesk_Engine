@@ -83,7 +83,7 @@ unsigned char mouse_reset(Mouse* mouse, unsigned char except_e){
 
 
 
-// Don't use this
+// Input.reset() / will reset your getkeydown keys. Place it idealy between your Input Requests and callback/handler frame
 unsigned char Input::reset(){
     // Keyboard
     this->keyboard.pressed_states = 0ULL;
@@ -95,7 +95,7 @@ unsigned char Input::reset(){
     this->mouse.events &= (LEFT_BTN_STATE | MIDDLE_BTN_STATE | RIGHT_BTN_STATE);
 
     // Input
-    this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG);
+    this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG | FOCUS_DEAD);
     return 0;
 }
 unsigned char Input:: full_reset(){
@@ -110,7 +110,7 @@ unsigned char Input:: full_reset(){
     this->mouse.events = 0;
 
     // Input
-    this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG | FOCUS_DEAD);
+    this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG | FOCUS_DEAD);
     return 0;
 }
 // Don't use this

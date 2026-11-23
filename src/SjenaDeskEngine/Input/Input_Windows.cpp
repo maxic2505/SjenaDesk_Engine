@@ -77,37 +77,47 @@ KeyCode api_key_map(int code) {
 }
 
 unsigned char Input::setup(Window* window, unsigned char settings){
-    if(!window) return 0xff;
-    if(!window->hwnd){
-        memset(this, 0, sizeof(Input));
-        if(window->register_window("SjenaDesk_RAWINPUT"))return 1;
-        if(window->create(&input_callback, this, (WINDOW_MSG_CODE)(MSG_INPUT | MSG_FOCUS), "SjenaDesk_RAWINPUT_MGR", NULL, 0, 0, 0, 0))return 1;
-    }
+    if(!window || !window->hwnd) return 0;
+    unsigned char header = 0;
+
+    // Setup
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-architecture#hid-clients-supported-in-windows
-    // 0x01 / 0x02 MOUSE
-    RAWINPUTDEVICE rid[2] = {0};
-    rid[0].usUsagePage = 0x01;
-    rid[0].usUsage = 0x02;
-    rid[0].dwFlags = (settings & MOUSE_BG) ? RIDEV_INPUTSINK : 0;
-    rid[0].hwndTarget = window->hwnd;
-
-    // 0x01 / 0x06 KEYBOARD
-    rid[1].usUsagePage = 0x01;
-    rid[1].usUsage = 0x06;
-    rid[1].dwFlags = (settings & KEYBOARD_BG) ? RIDEV_INPUTSINK : 0;
-    rid[1].hwndTarget = window->hwnd;
-
-    // Register & refresh header
-    unsigned char status = RegisterRawInputDevices(rid, 2, sizeof(RAWINPUTDEVICE));
-    if(status){
-        if(settings & MOUSE_BG)this->header |= MOUSE_BG;
-        else this->header &= ~MOUSE_BG;
-        if(settings & KEYBOARD_BG)this->header |= KEYBOARD_BG;
-        else this->header &= ~KEYBOARD_BG;
-        this->full_reset();
+    RAWINPUTDEVICE rid_mouse[1] = {0};
+    if(settings & DeviceHeader::MOUSE){
+        // 0x01 / 0x02 MOUSE
+        rid_mouse[0].usUsagePage = 0x01;
+        rid_mouse[0].usUsage = 0x02;
+        rid_mouse[0].dwFlags = (settings & MOUSE_BG) ? RIDEV_INPUTSINK : 0;
+        rid_mouse[0].hwndTarget = window->hwnd;
+        
+        if(RegisterRawInputDevices(rid_mouse, 1, sizeof(RAWINPUTDEVICE))){
+            header |= DeviceHeader::MOUSE;
+            if(settings & MOUSE_BG)header |= MOUSE_BG;
+            else header &= ~MOUSE_BG;
+        }
     }
-    // Since RegisterRawInputDevices() returns 1 if success
-    return !status;
+    if(settings & DeviceHeader::KEYBOARD){
+        // 0x01 / 0x06 KEYBOARD
+        RAWINPUTDEVICE rid_kb[1] = {0};
+        rid_kb[0].usUsagePage = 0x01;
+        rid_kb[0].usUsage = 0x06;
+        rid_kb[0].dwFlags = (settings & KEYBOARD_BG) ? RIDEV_INPUTSINK : 0;
+        rid_kb[0].hwndTarget = window->hwnd;
+        header |= DeviceHeader::KEYBOARD;
+        if(RegisterRawInputDevices(rid_kb, 1, sizeof(RAWINPUTDEVICE))){
+            header |= DeviceHeader::KEYBOARD;
+            if(settings & KEYBOARD_BG)this->header |= KEYBOARD_BG;
+            else this->header &= ~KEYBOARD_BG;
+        }
+    }
+
+    this->full_reset();
+    this->header = header;
+    return header;
+}
+
+unsigned char Input::destroy(){
+
 }
 
 unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
@@ -120,7 +130,7 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
             this->keyboard.pressed_states = 0ULL;
             this->keyboard.is_pressed_keys = 0ULL;
         }
-        this->header &= (MOUSE_STATUS | MOUSE_BG | KEYBOARD_STATUS | KEYBOARD_BG | FOCUS_DEAD);
+        this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG | FOCUS_DEAD);
         return 0;
     }
     

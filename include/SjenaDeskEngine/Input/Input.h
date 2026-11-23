@@ -62,10 +62,10 @@ unsigned char mouse_get_event(Mouse* mouse, MouseEvent event);
 unsigned char mouse_reset(Mouse* mouse, unsigned char except_e);
 
 typedef enum DeviceHeader : unsigned char{
-    MOUSE_STATUS    = 1<<0,
+    MOUSE           = 1<<0,
     MOUSE_BG        = 1<<1,
     MOUSE_IN_FG     = 1<<2,
-    KEYBOARD_STATUS = 1<<3,
+    KEYBOARD        = 1<<3,
     KEYBOARD_BG     = 1<<4,
     KEYBOARD_IN_FG  = 1<<5,
     FOCUS_DEAD      = 1<<6,
@@ -73,12 +73,8 @@ typedef enum DeviceHeader : unsigned char{
 }DeviceHeader;
 
 typedef struct Input{
-    Keyboard keyboard;
     Mouse mouse;
-
-    #ifdef _WIN32
-    HWND hWnd;
-    #endif
+    Keyboard keyboard;
 
     unsigned char header;
 

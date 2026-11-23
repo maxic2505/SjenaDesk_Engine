@@ -1,5 +1,34 @@
 #include "SjenaDeskEngine/Graphics/Graphics.h"
 
+
+
+// C - BRIDGE
+
+// Graphic | Register a Window | 0 = Success
+unsigned char graphic_register_window(Window* window, const char* class_name) {
+	return (window) ? window->register_window(class_name) : 1;
+}
+
+// Graphic | Creates a Window | 0 = Success
+unsigned char graphic_create_window(Window* window, Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height) {
+	return (window) ? window->create(msg, flags, name, window_style, x, y, width, height) : 1;
+}
+
+// Graphic | Show/Hidde a Window | 0 = Success
+unsigned char graphic_set_visibility(Window* window, const unsigned char visibility) {
+	return (window) ? window->set_visibility(visibility) : 1;
+}
+
+// Graphic | Set/Change a Window pos. | 0 = Success
+unsigned char graphic_set_pos_window(Window* window, uVec2 pos){
+	return (window) ? window->set_pos(pos) : 1;
+}
+
+// Graphic | Destroy a Window | 0 = Success
+unsigned char graphic_destroy_window(Window* window) {
+	return (window) ? window->destroy() : 1;
+}
+
 // CPP - MAIN
 
 // Graphic | UI | Create Plain Object | 0 = Success

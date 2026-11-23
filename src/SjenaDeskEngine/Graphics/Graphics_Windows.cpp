@@ -8,7 +8,6 @@
 typedef struct HWND_SLOT{
 	HWND hwnd;
 	Window_Message msg_ptr;
-	void* msg_class_ptr;
 	WINDOW_MSG_CODE flags;
 }HWND_SLOT;
 
@@ -30,11 +29,11 @@ typedef struct HWND_MGR{
 		}
 		return NULL;
 	}
-	unsigned char add(HWND hwnd, Window_Message msg_ptr, void* msg_class_ptr, WINDOW_MSG_CODE flags){
+	unsigned char add(HWND hwnd, Window_Message msg_ptr, WINDOW_MSG_CODE flags){
 		if(!hwnd || !msg_ptr) return 1;
 		void* ptr = realloc(data, (size+1) * sizeof(HWND_SLOT));
 		if(!ptr)return 4;
-		((HWND_SLOT*)ptr)[size++] = HWND_SLOT{hwnd, msg_ptr, msg_class_ptr, flags};
+		((HWND_SLOT*)ptr)[size++] = HWND_SLOT{hwnd, msg_ptr, flags};
 		data = (HWND_SLOT*)ptr;
 		return 0;
 	};
@@ -71,53 +70,53 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		switch (uMsg){
 		//CYCLE
 		case WM_CREATE:
-			if(ptr->flags & MSG_CYCLE_CREATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CREATE, 0, 0);
+			if(ptr->flags & MSG_CYCLE_CREATE) ptr->msg_ptr(MSG_CYCLE_CREATE, 0, 0);
 		break;
 		case WM_CLOSE:
-			if(ptr->flags & MSG_CYCLE_CLOSE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_CLOSE, 0, 0);
+			if(ptr->flags & MSG_CYCLE_CLOSE) ptr->msg_ptr(MSG_CYCLE_CLOSE, 0, 0);
 		break;
 		case WM_NCDESTROY:
 			mgr.remove(hwnd);
 			break;
 		case WM_DESTROY:
-			if(ptr->flags & MSG_CYCLE_DESTROY) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CYCLE_DESTROY, 0, 0);
+			if(ptr->flags & MSG_CYCLE_DESTROY) ptr->msg_ptr(MSG_CYCLE_DESTROY, 0, 0);
 			PostQuitMessage(0);
 		break;
 
 		//WINDOW
 		case WM_SIZE:
-			if(ptr->flags & MSG_WINDOW_SIZE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_SIZE, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_SIZE) ptr->msg_ptr(MSG_WINDOW_SIZE, wParam, (unsigned long long)lParam);
 		break;
 		case WM_MOVE:
-			if(ptr->flags & MSG_WINDOW_MOVE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_MOVE, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_MOVE) ptr->msg_ptr(MSG_WINDOW_MOVE, wParam, (unsigned long long)lParam);
 		break;
 		case WM_SETFOCUS:
-			if(ptr->flags & MSG_WINDOW_SETFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_SETFOCUS, 0, 0);
+			if(ptr->flags & MSG_WINDOW_SETFOCUS) ptr->msg_ptr(MSG_WINDOW_SETFOCUS, 0, 0);
 		break;
 		case WM_KILLFOCUS:
-			if(ptr->flags & MSG_WINDOW_KILLFOCUS) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_KILLFOCUS, 0, 0);
+			if(ptr->flags & MSG_WINDOW_KILLFOCUS) ptr->msg_ptr(MSG_WINDOW_KILLFOCUS, 0, 0);
 		break;
 		case WM_ACTIVATE:
-			if(ptr->flags & MSG_WINDOW_ACTIVATE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_ACTIVATE, 0, 0);
+			if(ptr->flags & MSG_WINDOW_ACTIVATE) ptr->msg_ptr(MSG_WINDOW_ACTIVATE, 0, 0);
 		break;
 		case WM_PAINT:
-			if(ptr->flags & MSG_WINDOW_PAINT) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_PAINT, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_PAINT) ptr->msg_ptr(MSG_WINDOW_PAINT, wParam, (unsigned long long)lParam);
 		break;
 		case WM_ENTERSIZEMOVE:
-			if(ptr->flags & MSG_WINDOW_ENTERRESIZE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_ENTERRESIZE, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_ENTERRESIZE) ptr->msg_ptr(MSG_WINDOW_ENTERRESIZE, wParam, (unsigned long long)lParam);
 		break;
 		case WM_EXITSIZEMOVE:
-			if(ptr->flags & MSG_WINDOW_EXITRESIZE) ptr->msg_ptr(ptr->msg_class_ptr, MSG_WINDOW_EXITRESIZE, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_WINDOW_EXITRESIZE) ptr->msg_ptr(MSG_WINDOW_EXITRESIZE, wParam, (unsigned long long)lParam);
 		break;
 		
 		// For Text usefull
 		case WM_CHAR:
-			if(ptr->flags & MSG_CHAR) ptr->msg_ptr(ptr->msg_class_ptr, MSG_CHAR, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_CHAR) ptr->msg_ptr(MSG_CHAR, wParam, (unsigned long long)lParam);
 		break;
 		
 		// RAWINPUT
 		case WM_INPUT:
-			if(ptr->flags & MSG_INPUT)ptr->msg_ptr(ptr->msg_class_ptr, MSG_INPUT, wParam, (unsigned long long)lParam);
+			if(ptr->flags & MSG_INPUT)ptr->msg_ptr(MSG_INPUT, wParam, (unsigned long long)lParam);
 		break;
 		case WM_INPUT_DEVICE_CHANGE: break;
 		default:break;
@@ -160,7 +159,7 @@ unsigned char Window::register_window(const char* class_name){
 }
 
 // Graphic | Creates a Window | 0 = Success
-unsigned char Window::create(Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height){
+unsigned char Window::create(Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height){
 	if (this->hwnd) return 1;
 	this->hwnd = CreateWindowExA(
 		0,
@@ -170,7 +169,7 @@ unsigned char Window::create(Window_Message msg, void* msg_class, WINDOW_MSG_COD
 		x, y, width, height,
 		NULL, NULL, GetModuleHandle(NULL), NULL);
 	if (!this->hwnd) return 1;
-	mgr.add(hwnd, msg, msg_class, flags);
+	mgr.add(hwnd, msg, flags);
 	return 0;
 }
 
@@ -210,34 +209,6 @@ unsigned char graphic_render_button(Object* object, HDC* hdc, HBRUSH* brush) {
 }
 unsigned char graphic_render_object(Object* object, HDC* hdc, HBRUSH* brush) {
 	return 0;
-}
-
-
-// C - BRIDGE
-
-// Graphic | Register a Window | 0 = Success
-unsigned char graphic_register_window(Window* window, const char* class_name) {
-	return (window) ? window->register_window(class_name) : 1;
-}
-
-// Graphic | Creates a Window | 0 = Success
-unsigned char graphic_create_window(Window* window, Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height) {
-	return (window) ? window->create(msg, msg_class, flags, name, window_style, x, y, width, height) : 1;
-}
-
-// Graphic | Show/Hidde a Window | 0 = Success
-unsigned char graphic_set_visibility(Window* window, const unsigned char visibility) {
-	return (window) ? window->set_visibility(visibility) : 1;
-}
-
-// Graphic | Set/Change a Window pos. | 0 = Success
-unsigned char graphic_set_pos_window(Window* window, uVec2 pos){
-	return (window) ? window->set_pos(pos) : 1;
-}
-
-// Graphic | Destroy a Window | 0 = Success
-unsigned char graphic_destroy_window(Window* window) {
-	return (window) ? window->destroy() : 1;
 }
 
 #endif

@@ -77,14 +77,13 @@ typedef enum WINDOW_MSG_CODE : unsigned long long{
 	MSG_BACKGROUND		 = 1ULL<<14,
 }WINDOW_MSG_CODE;
 
-typedef unsigned char(*Window_Message)(void* class_ptr, WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
+typedef unsigned char(*Window_Message)(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
 
 #define MSG_WINDOW (MSG_WINDOW_MOVE | MSG_WINDOW_SIZE | MSG_WINDOW_PAINT | MSG_WINDOW_ACTIVATE | MSG_WINDOW_SETFOCUS | MSG_WINDOW_KILLFOCUS)
 #define MSG_CYCLE (MSG_CYCLE_CREATE | MSG_CYCLE_CLOSE | MSG_CYCLE_DESTROY)
 #define MSG_FOCUS (MSG_WINDOW_KILLFOCUS | MSG_WINDOW_SETFOCUS | MSG_WINDOW_ACTIVATE)
 typedef struct Window {
 	char* class_name;
-	Object* objects;
 	unsigned long long size;
 
 	#if defined(_WIN32)
@@ -95,9 +94,10 @@ typedef struct Window {
 
 	#ifdef __cplusplus
 	unsigned char register_window	(const char* class_name);
-	unsigned char create			(Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
+	unsigned char create			(Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
 	unsigned char set_visibility	(const unsigned char visibility);
 	unsigned char set_pos			(uVec2 pos);
+	unsigned char handler			();
 	unsigned char destroy			();
 	#endif
 }Window;
@@ -110,6 +110,7 @@ unsigned char graphic_register_window	(Window* window, const char* class_name);
 unsigned char graphic_create_window		(Window* window, Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
 unsigned char graphic_set_visibility	(Window* window, const unsigned char visibility);
 unsigned char graphic_set_pos_window	(Window* window, uVec2 pos);
+unsigned char graphic_window_handler	(Window* window);
 unsigned char graphic_destroy_window	(Window* window);
 
 unsigned char graphic_create_text		(Object* object, uVec2 position, uVec2 size, const char* text, Text* properties, Extra extra, unsigned int id);
