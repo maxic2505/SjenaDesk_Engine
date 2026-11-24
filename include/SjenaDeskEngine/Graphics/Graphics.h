@@ -60,6 +60,7 @@ typedef struct Object {
 }Object;
 
 typedef enum WINDOW_MSG_CODE : unsigned long long{
+	MSG_EMPTY			 = 0ULL,
 	MSG_INPUT			 = 1ULL<<0,
 	MSG_CYCLE_CREATE	 = 1ULL<<1,
 	MSG_CYCLE_CLOSE		 = 1ULL<<2,
@@ -96,7 +97,7 @@ typedef struct Window {
 	unsigned char register_window	(const char* class_name);
 	unsigned char create			(Window_Message msg, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
 	unsigned char set_visibility	(const unsigned char visibility);
-	unsigned char set_pos			(uVec2 pos);
+	unsigned char set_pos			(iVec2 pos);
 	unsigned char handler			();
 	unsigned char destroy			();
 	#endif
@@ -109,7 +110,7 @@ extern "C"{
 unsigned char graphic_register_window	(Window* window, const char* class_name);
 unsigned char graphic_create_window		(Window* window, Window_Message msg, void* msg_class, WINDOW_MSG_CODE flags, const char* name, long window_style, const long x, const long y, const long width, const long height);
 unsigned char graphic_set_visibility	(Window* window, const unsigned char visibility);
-unsigned char graphic_set_pos_window	(Window* window, uVec2 pos);
+unsigned char graphic_set_pos_window	(Window* window, iVec2 pos);
 unsigned char graphic_window_handler	(Window* window);
 unsigned char graphic_destroy_window	(Window* window);
 

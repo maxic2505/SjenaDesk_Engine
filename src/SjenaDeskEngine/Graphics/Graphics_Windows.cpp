@@ -67,60 +67,62 @@ HWND_MGR mgr = {0};
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 	HWND_SLOT* ptr = mgr.get_slot_by_hwnd(hwnd);
 	if(ptr){
+		WINDOW_MSG_CODE code = MSG_EMPTY;
 		switch (uMsg){
 		//CYCLE
 		case WM_CREATE:
-			if(ptr->flags & MSG_CYCLE_CREATE) ptr->msg_ptr(MSG_CYCLE_CREATE, 0, 0);
+			code = MSG_CYCLE_CREATE;
 		break;
 		case WM_CLOSE:
-			if(ptr->flags & MSG_CYCLE_CLOSE) ptr->msg_ptr(MSG_CYCLE_CLOSE, 0, 0);
+			code = MSG_CYCLE_CLOSE;
 		break;
 		case WM_NCDESTROY:
 			mgr.remove(hwnd);
 			break;
 		case WM_DESTROY:
-			if(ptr->flags & MSG_CYCLE_DESTROY) ptr->msg_ptr(MSG_CYCLE_DESTROY, 0, 0);
+			code = MSG_CYCLE_DESTROY;
 			PostQuitMessage(0);
 		break;
 
 		//WINDOW
 		case WM_SIZE:
-			if(ptr->flags & MSG_WINDOW_SIZE) ptr->msg_ptr(MSG_WINDOW_SIZE, wParam, (unsigned long long)lParam);
+			code = MSG_WINDOW_SIZE;
 		break;
 		case WM_MOVE:
-			if(ptr->flags & MSG_WINDOW_MOVE) ptr->msg_ptr(MSG_WINDOW_MOVE, wParam, (unsigned long long)lParam);
+			code = MSG_WINDOW_MOVE;
 		break;
 		case WM_SETFOCUS:
-			if(ptr->flags & MSG_WINDOW_SETFOCUS) ptr->msg_ptr(MSG_WINDOW_SETFOCUS, 0, 0);
+			code = MSG_WINDOW_SETFOCUS;
 		break;
 		case WM_KILLFOCUS:
-			if(ptr->flags & MSG_WINDOW_KILLFOCUS) ptr->msg_ptr(MSG_WINDOW_KILLFOCUS, 0, 0);
+			code = MSG_WINDOW_KILLFOCUS;
 		break;
 		case WM_ACTIVATE:
-			if(ptr->flags & MSG_WINDOW_ACTIVATE) ptr->msg_ptr(MSG_WINDOW_ACTIVATE, 0, 0);
+			code = MSG_WINDOW_ACTIVATE;
 		break;
 		case WM_PAINT:
-			if(ptr->flags & MSG_WINDOW_PAINT) ptr->msg_ptr(MSG_WINDOW_PAINT, wParam, (unsigned long long)lParam);
+			code = MSG_WINDOW_PAINT;
 		break;
 		case WM_ENTERSIZEMOVE:
-			if(ptr->flags & MSG_WINDOW_ENTERRESIZE) ptr->msg_ptr(MSG_WINDOW_ENTERRESIZE, wParam, (unsigned long long)lParam);
+			code = MSG_WINDOW_ENTERRESIZE;
 		break;
 		case WM_EXITSIZEMOVE:
-			if(ptr->flags & MSG_WINDOW_EXITRESIZE) ptr->msg_ptr(MSG_WINDOW_EXITRESIZE, wParam, (unsigned long long)lParam);
+			code = MSG_WINDOW_EXITRESIZE;
 		break;
 		
 		// For Text usefull
 		case WM_CHAR:
-			if(ptr->flags & MSG_CHAR) ptr->msg_ptr(MSG_CHAR, wParam, (unsigned long long)lParam);
+			code = MSG_CHAR;
 		break;
 		
 		// RAWINPUT
 		case WM_INPUT:
-			if(ptr->flags & MSG_INPUT)ptr->msg_ptr(MSG_INPUT, wParam, (unsigned long long)lParam);
+			code = MSG_INPUT;
 		break;
 		case WM_INPUT_DEVICE_CHANGE: break;
 		default:break;
 		}
+		if (ptr->msg_ptr(code, wParam, (unsigned long long)lParam) == 0xff) PostMessage(hwnd, WM_CLOSE, 0, 0);
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
@@ -181,11 +183,21 @@ unsigned char Window::set_visibility(const unsigned char visibility){
 }
 
 // Graphic | Set/Change a Window pos. | 0 = Success
-unsigned char Window::set_pos(uVec2 pos){
+unsigned char Window::set_pos(iVec2 pos){
 	if(!this->hwnd)return 1;
 	SetWindowPos(this->hwnd, NULL, pos.x, pos.y, NULL, NULL, SWP_NOSIZE | SWP_NOZORDER);
 	UpdateWindow(this->hwnd);
 	return 0;
+}
+unsigned char Window::handler(){
+	MSG msg;
+    // Keep Windows Thread alive
+    while (GetMessage(&msg, nullptr, 0, 0)>0) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+        if(msg.message == WM_QUIT)return 1;
+    }
+    return 0;
 }
 
 // Graphic | Destroy a Window | 0 = Success

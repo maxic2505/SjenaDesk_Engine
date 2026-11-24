@@ -76,18 +76,21 @@ KeyCode api_key_map(int code) {
     }
 }
 
+// Registers Devices to a Window and returns the header that got applied
 unsigned char Input::setup(Window* window, unsigned char settings){
     if(!window || !window->hwnd) return 0;
     unsigned char header = 0;
 
     // Setup
     // https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-architecture#hid-clients-supported-in-windows
+    // https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-rawinputdevice
+    // Sets RIDEV_NOLEGACY to avoid unnecesarry calls with or without background collection(INPUTSINK)
     RAWINPUTDEVICE rid_mouse[1] = {0};
     if(settings & DeviceHeader::MOUSE){
         // 0x01 / 0x02 MOUSE
         rid_mouse[0].usUsagePage = 0x01;
         rid_mouse[0].usUsage = 0x02;
-        rid_mouse[0].dwFlags = (settings & MOUSE_BG) ? RIDEV_INPUTSINK : 0;
+        rid_mouse[0].dwFlags = ((settings & MOUSE_BG) ? RIDEV_INPUTSINK : 0);
         rid_mouse[0].hwndTarget = window->hwnd;
         
         if(RegisterRawInputDevices(rid_mouse, 1, sizeof(RAWINPUTDEVICE))){
@@ -101,13 +104,13 @@ unsigned char Input::setup(Window* window, unsigned char settings){
         RAWINPUTDEVICE rid_kb[1] = {0};
         rid_kb[0].usUsagePage = 0x01;
         rid_kb[0].usUsage = 0x06;
-        rid_kb[0].dwFlags = (settings & KEYBOARD_BG) ? RIDEV_INPUTSINK : 0;
+        rid_kb[0].dwFlags = ((settings & KEYBOARD_BG) ? RIDEV_INPUTSINK : 0);
         rid_kb[0].hwndTarget = window->hwnd;
         header |= DeviceHeader::KEYBOARD;
         if(RegisterRawInputDevices(rid_kb, 1, sizeof(RAWINPUTDEVICE))){
             header |= DeviceHeader::KEYBOARD;
-            if(settings & KEYBOARD_BG)this->header |= KEYBOARD_BG;
-            else this->header &= ~KEYBOARD_BG;
+            if(settings & KEYBOARD_BG)header |= KEYBOARD_BG;
+            else header &= ~KEYBOARD_BG;
         }
     }
 
@@ -116,26 +119,52 @@ unsigned char Input::setup(Window* window, unsigned char settings){
     return header;
 }
 
+//Unregisters RawInputDevice and returns Devices that got Unregistered
 unsigned char Input::destroy(){
+    unsigned char header = 0;
 
+    // Setup
+    // https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-architecture#hid-clients-supported-in-windows
+    RAWINPUTDEVICE rid_mouse[1] = {0};
+    if(this->header & DeviceHeader::MOUSE){
+        // 0x01 / 0x02 MOUSE
+        rid_mouse[0].usUsagePage = 0x01;
+        rid_mouse[0].usUsage = 0x02;
+        rid_mouse[0].dwFlags = RIDEV_REMOVE;
+        rid_mouse[0].hwndTarget = nullptr;
+        
+        if(RegisterRawInputDevices(rid_mouse, 1, sizeof(RAWINPUTDEVICE))){
+            header |= DeviceHeader::MOUSE;
+        }
+    }
+    if(this->header & DeviceHeader::KEYBOARD){
+        // 0x01 / 0x06 KEYBOARD
+        RAWINPUTDEVICE rid_kb[1] = {0};
+        rid_kb[0].usUsagePage = 0x01;
+        rid_kb[0].usUsage = 0x06;
+        rid_kb[0].dwFlags = RIDEV_REMOVE;
+        rid_kb[0].hwndTarget = nullptr;
+        header |= DeviceHeader::KEYBOARD;
+        if(RegisterRawInputDevices(rid_kb, 1, sizeof(RAWINPUTDEVICE))){
+            header |= DeviceHeader::KEYBOARD;
+        }
+    }
+
+    this->full_reset();
+    this->header = 0;
+    return header;
 }
 
 unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
     // TODO: Optimize and try to check if windows lost focus without global input & if global input blocked because app with admin is in Foreground
     if((msg & MSG_WINDOW_KILLFOCUS)){
-        this->header |= FOCUS_DEAD;
         if(!(this->header & MOUSE_BG)) this->mouse.reset(0);
         if(!(this->header & KEYBOARD_BG)){
             // Keyboard
             this->keyboard.pressed_states = 0ULL;
             this->keyboard.is_pressed_keys = 0ULL;
         }
-        this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG | FOCUS_DEAD);
-        return 0;
-    }
-    
-    if(msg & MSG_WINDOW_SETFOCUS){
-        this->header &= ~FOCUS_DEAD;
+        this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG);
         return 0;
     }
 
@@ -147,7 +176,6 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         switch (ri.header.dwType)
         {
             case RIM_TYPEMOUSE: {
-                if(!(this->header & MOUSE_BG) && (this->header & FOCUS_DEAD))return 0;
                 if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= MOUSE_IN_FG;
                 // Mouse Buttons
                 const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
@@ -184,7 +212,6 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
             }
             
             case RIM_TYPEKEYBOARD: {
-                if(!(this->header & KEYBOARD_BG) && (this->header & FOCUS_DEAD))return 0;
                 if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= KEYBOARD_IN_FG;
                 if(ri.data.keyboard.Flags & RI_KEY_E1)break;
                 unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
@@ -202,15 +229,7 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
 }
 
 unsigned char Input::handler(){
-    this->reset();
-    MSG msg;
-    // Keep Windows Thread alive
-    while (GetMessage(&msg, nullptr, 0, 0)>0) {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-        if(msg.message == WM_QUIT)return 1;
-    }
-    return 0;
+    return this->reset();
 }
 
 #endif

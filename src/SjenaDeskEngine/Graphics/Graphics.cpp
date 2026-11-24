@@ -20,7 +20,7 @@ unsigned char graphic_set_visibility(Window* window, const unsigned char visibil
 }
 
 // Graphic | Set/Change a Window pos. | 0 = Success
-unsigned char graphic_set_pos_window(Window* window, uVec2 pos){
+unsigned char graphic_set_pos_window(Window* window, iVec2 pos){
 	return (window) ? window->set_pos(pos) : 1;
 }
 
