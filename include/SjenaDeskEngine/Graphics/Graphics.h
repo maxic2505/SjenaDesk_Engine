@@ -78,6 +78,14 @@ typedef enum WINDOW_MSG_CODE : unsigned long long{
 	MSG_BACKGROUND		 = 1ULL<<14,
 }WINDOW_MSG_CODE;
 
+typedef enum WINDOW_RETURN_MSG_CODE : unsigned char{
+	R_MSG_OK,
+	R_MSG_ERROR,
+	R_MSG_REQUEST_DENY,
+	R_MSG_REQUEST_ACCEPT,
+	R_MSG_CLOSE,
+}WINDOW_RETURN_MSG_CODE;
+
 typedef unsigned char(*Window_Message)(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
 
 #define MSG_WINDOW (MSG_WINDOW_MOVE | MSG_WINDOW_SIZE | MSG_WINDOW_PAINT | MSG_WINDOW_ACTIVATE | MSG_WINDOW_SETFOCUS | MSG_WINDOW_KILLFOCUS)

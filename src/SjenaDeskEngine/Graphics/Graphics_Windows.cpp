@@ -122,7 +122,13 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
 		case WM_INPUT_DEVICE_CHANGE: break;
 		default:break;
 		}
-		if (ptr->msg_ptr(code, wParam, (unsigned long long)lParam) == 0xff) PostMessage(hwnd, WM_CLOSE, 0, 0);
+		WINDOW_RETURN_MSG_CODE response = (WINDOW_RETURN_MSG_CODE)ptr->msg_ptr(code, wParam, (unsigned long long)lParam);
+		switch (response)
+		{
+			case R_MSG_REQUEST_ACCEPT:break;
+			case R_MSG_REQUEST_DENY:break;
+			case R_MSG_CLOSE:PostMessage(hwnd, WM_CLOSE, 0, 0);break;
+		}
 	}
 	return DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
