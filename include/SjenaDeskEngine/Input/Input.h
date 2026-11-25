@@ -68,8 +68,8 @@ typedef enum DeviceHeader : unsigned char{
     KEYBOARD        = 1<<3,
     KEYBOARD_BG     = 1<<4,
     KEYBOARD_IN_FG  = 1<<5,
-    FOCUS_DEAD      = 1<<6,
-    U2              = 1<<7,
+    //MOUSE_EVENT     = 1<<6,
+    KEYBOARD_EVENT  = 1<<7,
 }DeviceHeader;
 
 typedef struct Input{
