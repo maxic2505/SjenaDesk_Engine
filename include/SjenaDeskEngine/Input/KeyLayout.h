@@ -1,8 +1,8 @@
 #pragma once
 // MAPS
 #define KEYCODE_SIZE_IN_BITS 64
-typedef enum KeyCode : unsigned long long{
-    SJENA_KEY_NULL = 0,
+typedef enum SjenaKeyCode : unsigned long long{
+    SJENA_KEY_NULL = 0ULL,
     // NUMMER
     SJENA_KEY_0 = 1ULL<<0,
     SJENA_KEY_1 = 1ULL<<1,
@@ -76,18 +76,24 @@ typedef enum KeyCode : unsigned long long{
     SJENA_KEY_TAB        = 1ULL<<61,
     SJENA_KEY_U3         = 1ULL<<62,
     SJENA_KEY_U2         = 1ULL<<63,
-} KeyCode;
+} SjenaKeyCode;
 
-#define MODIFIER_KEYS (KEYCODE_LEFT_CTRL | KEYCODE_RIGHT_CTRL | KEYCODE_LEFT_ALT | KEYCODE_RIGHT_ALT)
+typedef unsigned long long SjenaKeyMask;
+
+
+
+#define MODIFIER_KEYS (SJENA_KEY_CTRL | SJENA_KEY_LEFT_ALT | SJENA_KEY_RIGHT_ALT | SJENA_KEY_SHIFT)
 
 typedef enum MouseEvent : unsigned char{
     SJENA_MOUSE_NULL                = 0,
     SJENA_MOUSE_STATE_LEFT          = 1<<0,
     SJENA_MOUSE_STATE_MIDDLE        = 1<<1,
     SJENA_MOUSE_STATE_RIGHT         = 1<<2,
-    SJENA_MOUSE_EVENT_LEFT_DOWN     = 1<<3,
-    SJENA_MOUSE_EVENT_MIDDLE_DOWN   = 1<<4,
-    SJENA_MOUSE_EVENT_RIGHT_DOWN    = 1<<5,
+    SJENA_MOUSE_EVENT_DOWN_LEFT     = 1<<3,
+    SJENA_MOUSE_EVENT_DOWN_MIDDLE   = 1<<4,
+    SJENA_MOUSE_EVENT_DOWN_RIGHT    = 1<<5,
     SJENA_MOUSE_EVENT_SENSOR        = 1<<6,
     SJENA_MOUSE_EVENT_SCROLL        = 1<<7
 }MouseEvent;
+
+#define SJENA_MOUSE_STATE_ALL (SJENA_MOUSE_STATE_LEFT | SJENA_MOUSE_STATE_MIDDLE | SJENA_MOUSE_STATE_RIGHT)

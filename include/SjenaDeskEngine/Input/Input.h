@@ -23,28 +23,26 @@ extern "C"{
 
 // DEVICE
 typedef struct Keyboard{
-    unsigned long long is_pressed_keys;
-    unsigned long long pressed_states;
+    SjenaKeyMask pressed_keys;
+    SjenaKeyMask held_keys;
     #ifdef __cplusplus
-    unsigned char get_key           (const KeyCode code);
-    unsigned char get_key_down      (const KeyCode code);
+    unsigned char get_key(const SjenaKeyCode code);
+    unsigned char get_key_down(const SjenaKeyCode code);
 
-    unsigned char set_key           (const KeyCode code, const unsigned char state);
-    unsigned char set_key_state_down(const KeyCode code);
-    unsigned char remove_state      (const KeyCode code);
+    unsigned char set_key(const SjenaKeyCode code, const unsigned char state);
+    unsigned char set_key_down(const SjenaKeyCode code);
 
-    unsigned char callback(KeyCode code, int value);
+    unsigned char callback(SjenaKeyCode code, int value);
     #endif
 }Keyboard;
 
-unsigned char keyboard_get_key          (Keyboard* keyboard, const KeyCode code);
-unsigned char keyboard_get_key_down     (Keyboard* keyboard, const KeyCode code);
+unsigned char keyboard_get_key(Keyboard* keyboard, const SjenaKeyCode code);
+unsigned char keyboard_get_key_down(Keyboard* keyboard, const SjenaKeyCode code);
 
-unsigned char keyboard_set_key              (Keyboard* keyboard, const KeyCode code, const unsigned char state);
-unsigned char keyboard_set_key_state_down   (Keyboard* keyboard, const KeyCode code);
-unsigned char keyboard_remove_state         (Keyboard* keyboard, const KeyCode code);
+unsigned char keyboard_set_key(Keyboard* keyboard, const SjenaKeyCode code, const unsigned char state);
+unsigned char keyboard_set_key_down(Keyboard* keyboard, const SjenaKeyCode code);
 
-unsigned char keyboard_callback(Keyboard* keyboard, KeyCode code, int value);
+unsigned char keyboard_callback(Keyboard* keyboard, SjenaKeyCode code, int value);
 
 typedef struct Mouse{
     iVec2 position;
@@ -53,35 +51,40 @@ typedef struct Mouse{
     short scroll_y;
     unsigned char events;
     #ifdef __cplusplus
-    unsigned char get_event(MouseEvent event);
+    unsigned char get(MouseEvent event);
     unsigned char reset(unsigned char except_e);
     #endif
 }Mouse;
 
-unsigned char mouse_get_event(Mouse* mouse, MouseEvent event);
+unsigned char mouse_get(Mouse* mouse, MouseEvent event);
 unsigned char mouse_reset(Mouse* mouse, unsigned char except_e);
 
-typedef enum DeviceHeader : unsigned char{
-    MOUSE           = 1<<0,
-    MOUSE_BG        = 1<<1,
-    MOUSE_IN_FG     = 1<<2,
-    KEYBOARD        = 1<<3,
-    KEYBOARD_BG     = 1<<4,
-    KEYBOARD_IN_FG  = 1<<5,
-    //MOUSE_EVENT     = 1<<6,
-    KEYBOARD_EVENT  = 1<<7,
-}DeviceHeader;
+typedef enum SjenaInputHeaderFlags : unsigned char{
+    SJENA_INPUT_DEVICE_MOUSE            = 1<<0,
+    SJENA_INPUT_DEVICE_KEYBOARD         = 1<<1,
+    SJENA_INPUT_SETTING_MOUSE_BG        = 1<<2,
+    SJENA_INPUT_SETTING_KEYBOARD_BG     = 1<<3,
+    SJENA_INPUT_STATE_FOCUSED           = 1<<4,
+    SJENA_INPUT_STATE_KEYBOARD_IN_FG    = 1<<5,
+    SJENA_INPUT_EVENT_MOUSE             = 1<<6,
+    SJENA_INPUT_EVENT_KEYBOARD          = 1<<7
+}SjenaInputHeaderFlags;
 
-static const typedef DeviceHeader_C
+typedef unsigned char SjenaInputHeaderMask;
+
+#define SJENA_INPUT_DEVICE_ALL (SJENA_INPUT_DEVICE_KEYBOARD | SJENA_INPUT_DEVICE_MOUSE)
+#define SJENA_INPUT_CONFIG_BG_MOUSE (SJENA_INPUT_DEVICE_MOUSE | SJENA_INPUT_SETTING_MOUSE_BG)
+#define SJENA_INPUT_CONFIG_BG_KEYBOARD (SJENA_INPUT_DEVICE_KEYBOARD | SJENA_INPUT_SETTING_KEYBOARD_BG)
+#define SJENA_INPUT_CONFIG_BG_ALL (SJENA_INPUT_CONFIG_BG_MOUSE | SJENA_INPUT_CONFIG_BG_KEYBOARD)
 
 typedef struct Input{
     Mouse mouse;
     Keyboard keyboard;
 
-    unsigned char header;
+    SjenaInputHeaderMask header;
 
     #ifdef __cplusplus
-    unsigned char setup(Window* window, unsigned char settings);
+    unsigned char setup(Window* window, SjenaInputHeaderMask settings);
     unsigned char destroy();
     unsigned char callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data);
     unsigned char handler();

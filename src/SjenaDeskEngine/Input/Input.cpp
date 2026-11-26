@@ -2,55 +2,50 @@
 
 #define POINTER_ERR 0XFF
 
-//DEVICE
-unsigned char Keyboard::get_key         (const KeyCode code){return (is_pressed_keys  & code) ? 1 : 0;}
-unsigned char Keyboard::get_key_down    (const KeyCode code){return (pressed_states   & code) ? 1 : 0;}
+unsigned char Keyboard::get_key         (const SjenaKeyCode code){return (held_keys & code) ? 1 : 0;}
 
-unsigned char Keyboard::set_key(const KeyCode code, const unsigned char state){
-    is_pressed_keys = (is_pressed_keys & ~code) | (state ? code : 0);
+unsigned char Keyboard::get_key_down    (const SjenaKeyCode code){return (pressed_keys & code) ? 1 : 0;}
+
+unsigned char Keyboard::set_key(const SjenaKeyCode code, const unsigned char state){
+    held_keys = (held_keys & ~code) | (state ? code : 0);
     return state;
 }
-unsigned char Keyboard::set_key_state_down(const KeyCode code){
-    pressed_states |= code;
-    return 0;
-}
-unsigned char Keyboard::remove_state(const KeyCode code){
-    pressed_states &= ~code;
+unsigned char Keyboard::set_key_down(const SjenaKeyCode code){
+    pressed_keys |= code;
     return 0;
 }
 
-unsigned char Keyboard::callback(KeyCode code, int value){
+unsigned char Keyboard::callback(SjenaKeyCode code, int value){
     if(code == 0ULL)return 0XFF;
     unsigned char down = value > 0;
     unsigned char was_down = this->get_key(code);
 
     this->set_key(code, down);
 
-    return (down && !was_down) ? this->set_key_state_down(code) : 0;
+    return (down && !was_down) ? this->set_key_down(code) : 0;
 }
 
-unsigned char keyboard_get_key(Keyboard* keyboard, const KeyCode code){
+// 0xFF = POINER_ERR
+unsigned char keyboard_get_key(Keyboard* keyboard, const SjenaKeyCode code){
     return (keyboard) ? keyboard->get_key(code) : POINTER_ERR;
 }
-unsigned char keyboard_get_key_down(Keyboard* keyboard, const KeyCode code){
+// 0xFF = POINER_ERR
+unsigned char keyboard_get_key_down(Keyboard* keyboard, const SjenaKeyCode code){
     return (keyboard) ? keyboard->get_key_down(code) : POINTER_ERR;
 }
     
-unsigned char keyboard_set_key(Keyboard* keyboard, const KeyCode code, const unsigned char state){
+unsigned char keyboard_set_key(Keyboard* keyboard, const SjenaKeyCode code, const unsigned char state){
     return (keyboard) ? keyboard->set_key(code, state) : POINTER_ERR;
 }
-unsigned char keyboard_set_key_state_down(Keyboard* keyboard, const KeyCode code){
-    return (keyboard) ? keyboard->set_key_state_down(code) : POINTER_ERR;
-}
-unsigned char keyboard_remove_state(Keyboard* keyboard, const KeyCode code){
-    return (keyboard) ? keyboard->remove_state(code) : POINTER_ERR;
+unsigned char keyboard_set_key_down(Keyboard* keyboard, const SjenaKeyCode code){
+    return (keyboard) ? keyboard->set_key_down(code) : POINTER_ERR;
 }
 
-unsigned char keyboard_callback(Keyboard* keyboard, KeyCode code, int value){
+unsigned char keyboard_callback(Keyboard* keyboard, SjenaKeyCode code, int value){
     return (keyboard) ? keyboard->callback(code, value) : POINTER_ERR;
 }
 
-unsigned char is_modifier(KeyCode code){
+unsigned char is_modifier(SjenaKeyCode code){
     return (code & MODIFIER_KEYS) ? 1 : 0;
 }
 
@@ -58,7 +53,7 @@ unsigned char is_modifier(KeyCode code){
 
 
 
-unsigned char Mouse::get_event(MouseEvent event){
+unsigned char Mouse::get(MouseEvent event){
     return (this->events & event) ? 1 : 0;
 }
 
@@ -71,8 +66,8 @@ unsigned char Mouse::reset(unsigned char except_e){
     return 0;
 }
 
-unsigned char mouse_get_event(Mouse* mouse, MouseEvent event){
-    return (mouse) ? mouse->get_event(event) : POINTER_ERR;
+unsigned char mouse_get(Mouse* mouse, MouseEvent event){
+    return (mouse) ? mouse->get(event) : POINTER_ERR;
 }
 
 unsigned char mouse_reset(Mouse* mouse, unsigned char except_e){
@@ -86,22 +81,22 @@ unsigned char mouse_reset(Mouse* mouse, unsigned char except_e){
 // Input.reset() / will reset your getkeydown keys. Place it idealy between your Input Requests and callback/handler frame
 unsigned char Input::reset(){
     // Keyboard
-    this->keyboard.pressed_states = 0ULL;
+    this->keyboard.pressed_keys = 0ULL;
 
-    // Mouse
+    // Remove every Mpuse Input Except Mouse held Keys
     this->mouse.acceleration = iVec2{0, 0};
     this->mouse.scroll_x = 0;
     this->mouse.scroll_y = 0;
-    this->mouse.events &= (LEFT_BTN_STATE | MIDDLE_BTN_STATE | RIGHT_BTN_STATE);
+    this->mouse.events &= SJENA_MOUSE_STATE_ALL;
 
     // Input
-    this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG | FOCUS_DEAD);
+    this->header &= (SJENA_INPUT_CONFIG_BG_ALL);
     return 0;
 }
-unsigned char Input:: full_reset(){
+unsigned char Input::full_reset(){
     // Keyboard
-    this->keyboard.pressed_states = 0ULL;
-    this->keyboard.is_pressed_keys = 0ULL;
+    this->keyboard.pressed_keys = 0ULL;
+    this->keyboard.held_keys = 0ULL;
 
     // Mouse
     this->mouse.acceleration = iVec2{0, 0};
@@ -110,7 +105,7 @@ unsigned char Input:: full_reset(){
     this->mouse.events = 0;
 
     // Input
-    this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG | FOCUS_DEAD);
+    this->header &= (SJENA_INPUT_CONFIG_BG_ALL);
     return 0;
 }
 // Don't use this

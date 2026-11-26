@@ -93,7 +93,6 @@ typedef unsigned char(*Window_Message)(WINDOW_MSG_CODE msg, unsigned long long c
 #define MSG_FOCUS (MSG_WINDOW_KILLFOCUS | MSG_WINDOW_SETFOCUS | MSG_WINDOW_ACTIVATE)
 typedef struct Window {
 	char* class_name;
-	unsigned long long size;
 
 	#if defined(_WIN32)
 	HWND hwnd;

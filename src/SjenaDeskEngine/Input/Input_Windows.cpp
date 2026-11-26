@@ -5,7 +5,7 @@
 #if defined(_WIN32)
 
 // KEYMAP | WINDOWS (SCANCODE)
-KeyCode api_key_map(int code) {
+SjenaKeyCode api_key_map(int code) {
     switch (code) {
     case 0x0B: return SJENA_KEY_0;
     case 0x02: return SJENA_KEY_1;
@@ -70,13 +70,13 @@ KeyCode api_key_map(int code) {
     case 0x42: return SJENA_KEY_F8;
     case 0x43: return SJENA_KEY_F9;
 
-    default:return (KeyCode)0ULL;
+    default:return SJENA_KEY_NULL;
     }
 }
 
 // Registers Devices to a Window and returns the header that got applied
 unsigned char Input::setup(Window* window, unsigned char settings){
-    if(!window || !window->hwnd) return 0;
+    if(!window || !window->hwnd || !(settings & (SJENA_INPUT_DEVICE_KEYBOARD | SJENA_INPUT_DEVICE_MOUSE))) return 0;
     unsigned char header = 0;
 
     // Setup
@@ -84,31 +84,31 @@ unsigned char Input::setup(Window* window, unsigned char settings){
     // https://learn.microsoft.com/en-us/windows/win32/api/winuser/ns-winuser-rawinputdevice
     // Sets RIDEV_NOLEGACY to avoid unnecesarry calls with or without background collection(INPUTSINK)
     RAWINPUTDEVICE rid_mouse[1] = {0};
-    if(settings & DeviceHeader::MOUSE){
+    if(settings & SJENA_INPUT_DEVICE_MOUSE){
         // 0x01 / 0x02 MOUSE
         rid_mouse[0].usUsagePage = 0x01;
         rid_mouse[0].usUsage = 0x02;
-        rid_mouse[0].dwFlags = ((settings & MOUSE_BG) ? RIDEV_INPUTSINK : 0);
+        rid_mouse[0].dwFlags = ((settings & SJENA_INPUT_SETTING_MOUSE_BG) ? RIDEV_INPUTSINK : 0);
         rid_mouse[0].hwndTarget = window->hwnd;
         
         if(RegisterRawInputDevices(rid_mouse, 1, sizeof(RAWINPUTDEVICE))){
-            header |= DeviceHeader::MOUSE;
-            if(settings & MOUSE_BG)header |= MOUSE_BG;
-            else header &= ~MOUSE_BG;
+            header |= SJENA_INPUT_DEVICE_MOUSE;
+            if(settings & SJENA_INPUT_SETTING_MOUSE_BG)header |= SJENA_INPUT_SETTING_MOUSE_BG;
+            else header &= ~SJENA_INPUT_SETTING_MOUSE_BG;
         }
     }
-    if(settings & DeviceHeader::KEYBOARD){
+    if(settings & SJENA_INPUT_DEVICE_KEYBOARD){
         // 0x01 / 0x06 KEYBOARD
         RAWINPUTDEVICE rid_kb[1] = {0};
         rid_kb[0].usUsagePage = 0x01;
         rid_kb[0].usUsage = 0x06;
-        rid_kb[0].dwFlags = ((settings & KEYBOARD_BG) ? RIDEV_INPUTSINK : 0);
+        rid_kb[0].dwFlags = ((settings & SJENA_INPUT_SETTING_KEYBOARD_BG) ? RIDEV_INPUTSINK : 0);
         rid_kb[0].hwndTarget = window->hwnd;
-        header |= DeviceHeader::KEYBOARD;
+        header |= SJENA_INPUT_DEVICE_KEYBOARD;
         if(RegisterRawInputDevices(rid_kb, 1, sizeof(RAWINPUTDEVICE))){
-            header |= DeviceHeader::KEYBOARD;
-            if(settings & KEYBOARD_BG)header |= KEYBOARD_BG;
-            else header &= ~KEYBOARD_BG;
+            header |= SJENA_INPUT_DEVICE_KEYBOARD;
+            if(settings & SJENA_INPUT_SETTING_KEYBOARD_BG)header |= SJENA_INPUT_SETTING_KEYBOARD_BG;
+            else header &= ~SJENA_INPUT_SETTING_KEYBOARD_BG;
         }
     }
 
@@ -121,10 +121,8 @@ unsigned char Input::setup(Window* window, unsigned char settings){
 unsigned char Input::destroy(){
     unsigned char header = 0;
 
-    // Setup
-    // https://learn.microsoft.com/en-us/windows-hardware/drivers/hid/hid-architecture#hid-clients-supported-in-windows
     RAWINPUTDEVICE rid_mouse[1] = {0};
-    if(this->header & DeviceHeader::MOUSE){
+    if(this->header & SJENA_INPUT_DEVICE_MOUSE){
         // 0x01 / 0x02 MOUSE
         rid_mouse[0].usUsagePage = 0x01;
         rid_mouse[0].usUsage = 0x02;
@@ -132,19 +130,19 @@ unsigned char Input::destroy(){
         rid_mouse[0].hwndTarget = nullptr;
         
         if(RegisterRawInputDevices(rid_mouse, 1, sizeof(RAWINPUTDEVICE))){
-            header |= DeviceHeader::MOUSE;
+            header |= SJENA_INPUT_DEVICE_MOUSE;
         }
     }
-    if(this->header & DeviceHeader::KEYBOARD){
+    if(this->header & SJENA_INPUT_DEVICE_KEYBOARD){
         // 0x01 / 0x06 KEYBOARD
         RAWINPUTDEVICE rid_kb[1] = {0};
         rid_kb[0].usUsagePage = 0x01;
         rid_kb[0].usUsage = 0x06;
         rid_kb[0].dwFlags = RIDEV_REMOVE;
         rid_kb[0].hwndTarget = nullptr;
-        header |= DeviceHeader::KEYBOARD;
+
         if(RegisterRawInputDevices(rid_kb, 1, sizeof(RAWINPUTDEVICE))){
-            header |= DeviceHeader::KEYBOARD;
+            header |= SJENA_INPUT_DEVICE_KEYBOARD;
         }
     }
 
@@ -156,13 +154,13 @@ unsigned char Input::destroy(){
 unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsigned long long data){
     // TODO: Optimize and try to check if windows lost focus without global input & if global input blocked because app with admin is in Foreground
     if((msg & MSG_WINDOW_KILLFOCUS)){
-        if(!(this->header & MOUSE_BG)) this->mouse.reset(0);
-        if(!(this->header & KEYBOARD_BG)){
+        if(!(this->header & SJENA_INPUT_SETTING_MOUSE_BG)) this->mouse.reset(0);
+        if(!(this->header & SJENA_INPUT_SETTING_KEYBOARD_BG)){
             // Keyboard
-            this->keyboard.pressed_states = 0ULL;
-            this->keyboard.is_pressed_keys = 0ULL;
+            this->keyboard.pressed_keys = 0ULL;
+            this->keyboard.held_keys = 0ULL;
         }
-        this->header &= (MOUSE | MOUSE_BG | KEYBOARD | KEYBOARD_BG);
+        this->header &= (SJENA_INPUT_CONFIG_BG_ALL);
         return 0;
     }
 
@@ -171,24 +169,26 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
         RAWINPUT ri;
         UINT ri_size = sizeof(ri);
         if(GetRawInputData((HRAWINPUT)data, RID_INPUT, &ri, &ri_size, sizeof(RAWINPUTHEADER)) == (UINT)-1)return 3;
+
+        if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= SJENA_INPUT_STATE_FOCUSED;
+
         switch (ri.header.dwType)
         {
             case RIM_TYPEMOUSE: {
-                if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= MOUSE_IN_FG;
                 // Mouse Buttons
                 const USHORT usButtonFlags = ri.data.mouse.usButtonFlags;
-                if(usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) this->mouse.events |= LEFT_BTN_STATE | LEFT_BTN_PRESSED;
-                if(usButtonFlags & RI_MOUSE_BUTTON_1_UP) this->mouse.events = this->mouse.events & ~LEFT_BTN_STATE;
+                if(usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) this->mouse.events |= SJENA_MOUSE_STATE_LEFT | SJENA_MOUSE_EVENT_DOWN_LEFT;
+                if(usButtonFlags & RI_MOUSE_BUTTON_1_UP) this->mouse.events = this->mouse.events & ~SJENA_MOUSE_STATE_LEFT;
 
-                if(usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) this->mouse.events |= RIGHT_BTN_STATE | RIGHT_BTN_PRESSED;
-                    if(usButtonFlags & RI_MOUSE_BUTTON_2_UP) this->mouse.events = this->mouse.events & ~RIGHT_BTN_STATE;
+                if(usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) this->mouse.events |= SJENA_MOUSE_STATE_RIGHT | SJENA_MOUSE_EVENT_DOWN_RIGHT;
+                if(usButtonFlags & RI_MOUSE_BUTTON_2_UP) this->mouse.events = this->mouse.events & ~SJENA_MOUSE_STATE_RIGHT;
 
-                if(usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) this->mouse.events |= MIDDLE_BTN_STATE | MIDDLE_BTN_PRESSED;
-                if(usButtonFlags & RI_MOUSE_BUTTON_3_UP) this->mouse.events = this->mouse.events & ~MIDDLE_BTN_STATE;
+                if(usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) this->mouse.events |= SJENA_MOUSE_STATE_MIDDLE | SJENA_MOUSE_EVENT_DOWN_MIDDLE;
+                if(usButtonFlags & RI_MOUSE_BUTTON_3_UP) this->mouse.events = this->mouse.events & ~SJENA_MOUSE_STATE_MIDDLE;
 
                 // Mouse Position & Acceleration
                 if(!(ri.data.mouse.usFlags & MOUSE_MOVE_ABSOLUTE)){
-                    if(ri.data.mouse.lLastX || ri.data.mouse.lLastY)this->mouse.events |= SENSOR_EVENT;
+                    if(ri.data.mouse.lLastX || ri.data.mouse.lLastY)this->mouse.events |= SJENA_MOUSE_EVENT_SENSOR;
                     // Reset at Input.reset() necesary
                     this->mouse.acceleration.x += ri.data.mouse.lLastX;
                     this->mouse.acceleration.y += ri.data.mouse.lLastY;
@@ -200,17 +200,16 @@ unsigned char Input::callback(WINDOW_MSG_CODE msg, unsigned long long code, unsi
                 // usButtonData
                 if(ri.data.mouse.usButtonFlags & RI_MOUSE_HWHEEL){
                     this->mouse.scroll_x += (short)ri.data.mouse.usButtonData;
-                    this->mouse.events |= SCROLL_EVENT;
+                    this->mouse.events |= SJENA_MOUSE_EVENT_SCROLL;
                 }
                 if(ri.data.mouse.usButtonFlags & RI_MOUSE_WHEEL){
                     this->mouse.scroll_y += (short)ri.data.mouse.usButtonData;
-                    this->mouse.events |= SCROLL_EVENT;
+                    this->mouse.events |= SJENA_MOUSE_EVENT_SCROLL;
                 }
                 break;
             }
             
             case RIM_TYPEKEYBOARD: {
-                if(!GET_RAWINPUT_CODE_WPARAM(code))this->header |= KEYBOARD_IN_FG;
                 if(ri.data.keyboard.Flags & RI_KEY_E1)break;
                 unsigned char down = !(ri.data.keyboard.Flags & RI_KEY_BREAK);
                 unsigned char e0   = ri.data.keyboard.Flags & RI_KEY_E0;
