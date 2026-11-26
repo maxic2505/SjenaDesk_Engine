@@ -80,9 +80,9 @@ typedef enum SjenaKeyCode : unsigned long long{
 
 typedef unsigned long long SjenaKeyMask;
 
-
-
 #define MODIFIER_KEYS (SJENA_KEY_CTRL | SJENA_KEY_LEFT_ALT | SJENA_KEY_RIGHT_ALT | SJENA_KEY_SHIFT)
+
+// TODO: Give MouseEvent an fitting name and mask for costistency
 
 typedef enum MouseEvent : unsigned char{
     SJENA_MOUSE_NULL                = 0,

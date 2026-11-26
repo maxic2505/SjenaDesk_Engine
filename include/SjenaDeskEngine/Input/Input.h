@@ -43,7 +43,7 @@ unsigned char keyboard_set_key(Keyboard* keyboard, const SjenaKeyCode code, cons
 unsigned char keyboard_set_key_down(Keyboard* keyboard, const SjenaKeyCode code);
 
 unsigned char keyboard_callback(Keyboard* keyboard, SjenaKeyCode code, int value);
-
+// TODO: Mouse.events struct own name with Mask at end
 typedef struct Mouse{
     iVec2 position;
     iVec2 acceleration;
@@ -81,6 +81,7 @@ typedef struct Input{
     Mouse mouse;
     Keyboard keyboard;
 
+    // TODO: give method to easily check events & states
     SjenaInputHeaderMask header;
 
     #ifdef __cplusplus

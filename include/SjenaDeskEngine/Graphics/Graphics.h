@@ -59,6 +59,8 @@ typedef struct Object {
 	#endif
 }Object;
 
+// TODO: Refactor WINDOW_(RETURN_)MSG_CODE FOR COSISTENCY & UPDATE callback for better handling
+
 typedef enum WINDOW_MSG_CODE : unsigned long long{
 	MSG_EMPTY			 = 0ULL,
 	MSG_INPUT			 = 1ULL<<0,
