@@ -72,6 +72,8 @@ typedef enum DeviceHeader : unsigned char{
     KEYBOARD_EVENT  = 1<<7,
 }DeviceHeader;
 
+static const typedef DeviceHeader_C
+
 typedef struct Input{
     Mouse mouse;
     Keyboard keyboard;
